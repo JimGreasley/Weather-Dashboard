@@ -1,0 +1,41 @@
+body {
+    padding: 0px 10px;
+}
+.card {
+    margin: 20px 0px;
+}
+.jumbotron {
+    height: 120px;
+    text-align: center;
+    background-color: #26309e;
+}
+.card-link {
+    color: black;
+}
+.card-link:hover {
+    color: blue;
+}
+
+.city {
+    font-size: 20px;
+}
+
+/* #search-history {
+    width: 300px;
+    height: 700px;
+    border-right: 1px solid black;
+    border-bottom: 1px solid black;
+} */
+
+#searchBtn {
+    border-left: 1px solid black;
+    border-top-right-radius: 15px;
+    border-bottom-right-radius: 15px;
+    background-color: #06AED5;
+    color: white;
+  }
+  
+#searchBtn i:hover {
+    font-size: 20px;
+    transition: all .3s ease-in-out;
+  }
