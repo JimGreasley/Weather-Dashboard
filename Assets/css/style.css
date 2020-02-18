@@ -1,9 +1,22 @@
-body {
+/* body {
     padding: 0px 10px;
+} */
+
+.no-gutters {
+    margin-right: 0;
+    margin-left: 0;
+  
+    > .col,
+    > [class*="col-"] {
+      padding-right: 0;
+      padding-left: 0;
+    }
 }
+
 .card {
     margin: 20px 0px;
 }
+
 .jumbotron {
     height: 120px;
     text-align: center;
@@ -16,8 +29,9 @@ body {
     color: blue;
 }
 
-.city {
-    font-size: 20px;
+.citydate {
+    font-size: 25px;
+    font-weight: 400;
 }
 
 /* #search-history {

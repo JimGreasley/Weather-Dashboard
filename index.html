@@ -20,7 +20,14 @@
         <div class="row">
             <div class="col-4">
                 <div class="row">
-                    <div class="col-9">
+                    <h5>Search for a City:</h5>
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" id="search-city" aria-label="City's name" aria-describedby="button-addon2">
+                        <div class="input-group-append">
+                          <button class="btn btn-outline-secondary" type="button" id="searchBtn">Button</button>
+                        </div>
+                      </div>
+                    <!-- <div class="col-9">
                         <form>
                             <div class="form-group">
                                 <label for="search">Search for a City:</label>
@@ -33,11 +40,18 @@
                         </form>
                     </div>
                     <div class="col-3">
-                        <button class="btn btn-primary" id="searchBtn" type="button">Srch</button>
-                    </div>
+                        <button class="btn btn-primary mt-4" id="searchBtn" type="button">Srch</button>
+                    </div> -->
                 </div>
                 <div class="row" id="city-history">
                     this area populated by history from local storage
+                    <ul class="list-group">
+                        <li class="list-group-item">Cras justo odio</li>
+                        <li class="list-group-item">Dapibus ac facilisis in</li>
+                        <li class="list-group-item">Morbi leo risus</li>
+                        <li class="list-group-item">Porta ac consectetur ac</li>
+                        <li class="list-group-item">Vestibulum at eros</li>
+                      </ul>
                 </div>
             </div>
             <div class="col-8" id="current-weather">
@@ -45,13 +59,6 @@
        </div>
     </div>
 
-    <!--
-    <footer class="footer mt-auto py-1 bg-transparent">
-        <div class="container text-center">
-            <span class="text-black">Made with lots and lots of love</span>
-        </div>
-    </footer>
--->
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"
         integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
