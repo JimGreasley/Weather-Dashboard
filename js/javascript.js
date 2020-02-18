@@ -1,26 +1,34 @@
 
 $(document).ready(function () {
     
+    // Global variables
     // Capture selector for HTML area to hold current weather data  
     var $currentWeather = $("#current-weather");
+    var $cityHistory    = $("#city-history");
 
     // This is my API key.
     var APIKey = "7514abfe02ab6db7877685958ec119d7";
 
-    //const date = new Date(1582059600000).toDateString();
-    //console.log(date);
+    // get Weather Cities history data from local storage
 
-    //var d = new Date();
-    //console.log(typeof d);
-    //var n = d.toLocaleDateString();
-    //console.log(d.toLocaleDateString());
+    var data        = localStorage.getItem("WeatherCities");
 
-    // will be for clear button
-    //$("#clear-link").on("click", function(event) {
-    //    event.preventDefault();
-    //    $("#result-card").empty();
-    //});
+    if (!data) {
+        // create new 'empty' Work Day Schedule array
+        // var weather_cities = [];
+        var weather_cities = ["Phoenix", "Los Angeles", "Seattle"];
+    } else {
+        var weather_cities = JSON.parse(data);
+    }
 
+    // add each city in weather_cities array to history list group
+    weather_cities.forEach(loadCity);
+  
+
+   // set Event to save text when corresponding save button is clicked
+   $("#city-list").click(selectCity);
+
+   
     // save button calls
     $("#searchBtn").on("click", function(event) {
         event.preventDefault();
@@ -38,6 +46,47 @@ $(document).ready(function () {
         }
         
     });
+
+
+  
+    function loadCity (cityName) {
+
+
+    var newListItem = $("<button>").addClass("list-group-item list-group-item-action");
+    newListItem.attr("type", "button");
+    newListItem.attr("id", "city-list");
+    newListItem.text(cityName);
+
+    // Append the new timeslot row to the page (Container element)
+    $cityHistory.append(newListItem);
+}
+
+ 
+    //-----------------------------------------------------------------------------------------
+    //  function to select city from history list when its list entry is clicked
+    //-----------------------------------------------------------------------------------------
+
+    function selectCity(e) {
+        event.preventDefault();  
+
+        //console.log($(this).siblings(".textarea").val());
+        //console.log($(this).attr("index"));
+        console.log($(this).text());
+
+        // capture index (typeof 'string') into work-day-schedule array 
+        //var idx = $(this).attr("index");
+        //console.log(typeof idx);
+
+        // save updated text in work_day_schedule array
+        //work_day_schedule[parseInt(idx)] = $(this).siblings(".textarea").val();
+
+        // Save updated work_day_schedule array in local storage
+        //localStorage.setItem("WorkDaySchedule", JSON.stringify(work_day_schedule));
+            
+    }
+
+
+
 
     function getCurrentWeather(city) {
     
@@ -99,12 +148,7 @@ $(document).ready(function () {
 
         });
 
-        //   Forecast: 
-        //var queryURL = 
-        // "http://api.openweathermap.org/data/2.5/forecast?id=" + cityID + "&units=imperial&appid=" +
-        // + APIKey;
 
-        //   Icon: "http://openweathermap.org/img/w/" + data.list[i].weather[0].icon + ".png"
     }
 
     //-------------------------------------------------------------------------------------
@@ -137,28 +181,62 @@ $(document).ready(function () {
             // loop will start here
 
             var colForecastDay1 = $("<div>").addClass("col-2");
-    
-            var rowForecastDate = $("<div>").addClass("row");
+            var rowForecastDate1 = $("<p>").addClass("row");
 
             var js_date = new Date(Number(response.list[7].dt) * 1000);
             //console.log(d.toLocaleDateString());
-            rowForecastDate.text(js_date.toLocaleDateString());
-            colForecastDay1.append(rowForecastDate);
+            rowForecastDate1.text(js_date.toLocaleDateString());
+            colForecastDay1.append(rowForecastDate1);
 
-            var rowForecastIcon = $("<img>").addClass("row");
-            rowForecastIcon.attr(
-                   "src",
-                   "http://openweathermap.org/img/w/" + response.list[7].weather[0].icon + ".png"
-             );
-            colForecastDay1.append(rowForecastIcon);
+            var colForecastDay2 = $("<div>").addClass("col-2");
+            var rowForecastDate2 = $("<p>").addClass("row");
 
-            var rowForecastTemp   = $("<div>").addClass("row");
-            rowForecastTemp.text("Temp: " + response.list[7].main.temp + " \u00B0F");
-            colForecastDay1.append(rowForecastTemp);
+            var js_date = new Date(Number(response.list[15].dt) * 1000);
+            //console.log(d.toLocaleDateString());
+            rowForecastDate2.text(js_date.toLocaleDateString());
+            colForecastDay2.append(rowForecastDate2);
 
-            var rowForecastHumidity = $("<div>").addClass("row");
-            rowForecastHumidity.text("Humidity: " + response.list[7].main.humidity + "%");
-            colForecastDay1.append(rowForecastHumidity);
+
+            var colForecastDay3 = $("<div>").addClass("col-2");
+            var rowForecastDate3 = $("<p>").addClass("row");
+
+            var js_date = new Date(Number(response.list[23].dt) * 1000);
+            //console.log(d.toLocaleDateString());
+            rowForecastDate3.text(js_date.toLocaleDateString());
+            colForecastDay3.append(rowForecastDate3);
+
+
+            var colForecastDay4 = $("<div>").addClass("col-2");
+            var rowForecastDate4 = $("<p>").addClass("row");
+
+            var js_date = new Date(Number(response.list[31].dt) * 1000);
+            //console.log(d.toLocaleDateString());
+            rowForecastDate4.text(js_date.toLocaleDateString());
+            colForecastDay4.append(rowForecastDate4);
+
+            var colForecastDay5 = $("<div>").addClass("col-2");
+            var rowForecastDate5 = $("<p>").addClass("row");
+
+            var js_date = new Date(Number(response.list[39].dt) * 1000);
+            //console.log(d.toLocaleDateString());
+            rowForecastDate5.text(js_date.toLocaleDateString());
+            colForecastDay5.append(rowForecastDate5);
+
+
+            // var rowForecastIcon = $("<img>").addClass("row");
+            // rowForecastIcon.attr(
+            //        "src",
+            //        "http://openweathermap.org/img/w/" + response.list[7].weather[0].icon + ".png"
+            //  );
+            // colForecastDay1.append(rowForecastIcon);
+
+            // var rowForecastTemp   = $("<div>").addClass("row");
+            // rowForecastTemp.text("Temp: " + response.list[7].main.temp + " \u00B0F");
+            // colForecastDay1.append(rowForecastTemp);
+
+            // var rowForecastHumidity = $("<div>").addClass("row");
+            // rowForecastHumidity.text("Humidity: " + response.list[7].main.humidity + "%");
+            // colForecastDay1.append(rowForecastHumidity);
 
             //for (let i = 7; i < 40; i = i + 8) {
             //   var d = new Date(Number(response.list[i].dt) * 1000);
@@ -166,7 +244,7 @@ $(document).ready(function () {
             //   response.list[i].main.temp_min, response.list[i].main.temp_max);
             //}
 
-            forecastRow.append(colForecastDay1);
+            forecastRow.append(colForecastDay1, colForecastDay2, colForecastDay3, colForecastDay4, colForecastDay5);
 
             $currentWeather.append(forecastRow);
 
@@ -184,7 +262,6 @@ $(document).ready(function () {
         // set up the AJAX query URL
     
         console.log("Get UV Index for lat (" + lat + ") and lon (" + lon + ")");
-        //console.log(moment().format("l"));
         //return;
         
         var queryURL =     
@@ -203,7 +280,7 @@ $(document).ready(function () {
 
             var uvIndexRow = $("<div>").addClass("row");
             var uvIndexSpan = $("<span>").attr("id", "uv-intensity");
-            uvIndexSpan.text(response.value);
+            uvIndexSpan.text(" " + response.value);
             // uvIndexRow.text("UV Index: " + " <span>" + " " + response.value +"</span>");
             uvIndexRow.text("UV Index: ");
             uvIndexRow.append(uvIndexSpan);
@@ -216,3 +293,27 @@ $(document).ready(function () {
 
     }
 });
+
+
+    //var d = new Date();
+    //console.log(typeof d);
+    //var n = d.toLocaleDateString();
+    //console.log(d.toLocaleDateString());
+
+    // will be for clear button
+    //$("#clear-link").on("click", function(event) {
+    //    event.preventDefault();
+    //    $("#result-card").empty();
+    //});
+
+    //<div class="list-group" id="city-history">
+    //<button type="button" class="list-group-item list-group-item-action">Phoenix</button>
+    //const date = new Date(1582059600000).toDateString();
+    //console.log(date);
+ 
+            //   Forecast: 
+        //var queryURL = 
+        // "http://api.openweathermap.org/data/2.5/forecast?id=" + cityID + "&units=imperial&appid=" +
+        // + APIKey;
+
+        //   Icon: "http://openweathermap.org/img/w/" + data.list[i].weather[0].icon + ".png"
