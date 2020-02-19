@@ -178,9 +178,72 @@ $(document).ready(function () {
             getUVIndex(cityID, latitude, longitude);
 
         });
-
-
     }
+
+
+    //-------------------------------------------------------------------------------------
+    // function to get the UV Index for the city in question using latitude and longitude
+    // returned in response to request for current weather above (getCurrentWeather). 
+    //-------------------------------------------------------------------------------------
+
+    function getUVIndex(cityId, lat, lon) {
+
+        // set up the AJAX query URL
+
+        console.log("Get UV Index for lat (" + lat + ") and lon (" + lon + ")");
+        //return;
+
+        var queryURL =
+            "http://api.openweathermap.org/data/2.5/uvi?appid=" +
+            APIKey
+            +
+            "&units=imperial&lat=" + lat + "&lon=" + lon;
+
+        $.ajax({
+            url: queryURL,
+            method: "GET"
+        }).then(function (response) {
+            console.log(response);
+            //var now = moment().format("MMMM Do, YYYY");
+            console.log(response.value);
+
+            var uvIndexRow = $("<div>").addClass("row");
+            var uvIndexSpan = $("<span>").attr("id", "uv-intensity");
+
+            var uvIndexNum = Number(response.value);
+            console.log("UV Index number: ", uvIndexNum);
+
+            // add class to UV Index to indicate whether value is low, medium, high or severe
+            if (uvIndexNum < 3) {
+                uvIndexSpan.addClass("favorable");
+                console.log("favorable");
+            }
+            else if (uvIndexNum < 6) {
+                uvIndexSpan.addClass("moderate");
+                console.log("moderate");
+            }
+            else if (uvIndexNum < 8) {
+                uvIndexSpan.addClass("high");
+                console.log("high");
+            }
+            else {
+                uvIndexSpan.addClass("severe");
+                console.log("severe");
+            }
+
+            uvIndexSpan.text(" " + response.value);
+            // uvIndexRow.text("UV Index: " + " <span>" + " " + response.value +"</span>");
+            uvIndexRow.text("UV Index: ");
+            uvIndexRow.append(uvIndexSpan);
+
+
+            $currentWeather.append(uvIndexRow);
+
+            getForecast(cityId);
+
+        });
+    }
+
 
     //-------------------------------------------------------------------------------------
     // function to get the 5-day forecast for the city in question using the city ID 
@@ -289,69 +352,7 @@ $(document).ready(function () {
     }
 
 
-    //-------------------------------------------------------------------------------------
-    // function to get the UV Index for the city in question using latitude and longitude
-    // returned in response to request for current weather above (getCurrentWeather). 
-    //-------------------------------------------------------------------------------------
-
-    function getUVIndex(cityId, lat, lon) {
-
-        // set up the AJAX query URL
-
-        console.log("Get UV Index for lat (" + lat + ") and lon (" + lon + ")");
-        //return;
-
-        var queryURL =
-            "http://api.openweathermap.org/data/2.5/uvi?appid=" +
-            APIKey
-            +
-            "&units=imperial&lat=" + lat + "&lon=" + lon;
-
-        $.ajax({
-            url: queryURL,
-            method: "GET"
-        }).then(function (response) {
-            console.log(response);
-            //var now = moment().format("MMMM Do, YYYY");
-            console.log(response.value);
-
-            var uvIndexRow = $("<div>").addClass("row");
-            var uvIndexSpan = $("<span>").attr("id", "uv-intensity");
-
-            var uvIndexNum = Number(response.value);
-            console.log("UV Index number: ", uvIndexNum);
-
-            // add class to UV Index to indicate whether value is low, medium, high or severe
-            if (uvIndexNum < 3) {
-                uvIndexSpan.addClass("favorable");
-                console.log("favorable");
-            }
-            else if (uvIndexNum < 6) {
-                uvIndexSpan.addClass("moderate");
-                console.log("moderate");
-            }
-            else if (uvIndexNum < 8) {
-                uvIndexSpan.addClass("high");
-                console.log("high");
-            }
-            else {
-                uvIndexSpan.addClass("severe");
-                console.log("severe");
-            }
-
-            uvIndexSpan.text(" " + response.value);
-            // uvIndexRow.text("UV Index: " + " <span>" + " " + response.value +"</span>");
-            uvIndexRow.text("UV Index: ");
-            uvIndexRow.append(uvIndexSpan);
-
-
-            $currentWeather.append(uvIndexRow);
-
-            getForecast(cityId);
-
-        });
-
-    }
+ 
 });
 
 
