@@ -48,6 +48,11 @@ $(document).ready(function () {
 
     });
 
+    //-----------------------------------------------------------------------------------------
+    //  function to save the current search city in the history array, if it doesn't already
+    //   exist, and to save the updated history in local storage. 
+    //-----------------------------------------------------------------------------------------
+
     function saveSearchCity(srchCity) {
 
         // search weather_cities array for the current search city
@@ -64,16 +69,14 @@ $(document).ready(function () {
         if (add_city_to_history) {
             console.log("adding search city " + srchCity + " to history");
             weather_cities.push(srchCity);
+            // Save updated work_day_schedule array in local storage
+            localStorage.setItem("WeatherCities", JSON.stringify(weather_cities));
         }
-
-
-        // save updated text in work_day_schedule array
-        //work_day_schedule[parseInt(idx)] = $(this).siblings(".textarea").val();
-
-        // Save updated work_day_schedule array in local storage
-        localStorage.setItem("WeatherCities", JSON.stringify(weather_cities));
-
     }
+
+    //-----------------------------------------------------------------------------------------
+    //  function to create a group list of city names from previous search history 
+    //-----------------------------------------------------------------------------------------
 
     function loadCity(cityName) {
 
