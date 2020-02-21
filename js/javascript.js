@@ -44,6 +44,8 @@ $(document).ready(function () {
             //console.log("city: ", searchCity);
             getCurrentWeather(searchCity);
             saveSearchCity(searchCity);
+            //should clear search-city  and re-display city list 
+            //not this now! window.location.href = "index.html";
         }
 
     });
@@ -156,7 +158,7 @@ $(document).ready(function () {
             var colIcon = $("<img>").addClass("col-1");
             colIcon.attr(
                 "src",
-                "http://openweathermap.org/img/w/" + response.weather[0].icon + ".png"
+                "https://openweathermap.org/img/w/" + response.weather[0].icon + ".png"
             );
 
             cityRow.append(colCity, colIcon);
@@ -194,7 +196,7 @@ $(document).ready(function () {
         //return;
 
         var queryURL =
-            "http://api.openweathermap.org/data/2.5/uvi?appid=" +
+            "https://api.openweathermap.org/data/2.5/uvi?appid=" +
             APIKey
             +
             "&units=imperial&lat=" + lat + "&lon=" + lon;
@@ -259,7 +261,7 @@ $(document).ready(function () {
         //return;
 
         var queryURL =
-            "http://api.openweathermap.org/data/2.5/forecast?id=" + cityID +
+            "https://api.openweathermap.org/data/2.5/forecast?id=" + cityID +
             "&units=imperial&appid=" +
             APIKey;
 
@@ -338,7 +340,7 @@ $(document).ready(function () {
         var forecastIcon = $("<img>");
         forecastIcon.attr(
             "src",
-            "http://openweathermap.org/img/w/" + resp.list[idx].weather[0].icon + ".png"
+            "https://openweathermap.org/img/w/" + resp.list[idx].weather[0].icon + ".png"
         );
         forecastDay.append(forecastIcon);
 
