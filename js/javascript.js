@@ -254,11 +254,13 @@ $(document).ready(function () {
 
     function getForecast(cityID) {
 
+        // array of forecast data (objects) for the next five days
+        var fiveDayForecast = [];
+
         // set up the AJAX query URL
 
         console.log("Geting forecast for city ID: " + cityID);
         //console.log(moment().format("l"));
-        //return;
 
         var queryURL =
             "https://api.openweathermap.org/data/2.5/forecast?id=" + cityID +
@@ -271,89 +273,151 @@ $(document).ready(function () {
         }).then(function (response) {
             console.log(response);
 
+             for (let i = 0; i < response.cnt; i++) {
+                 var js_d = new Date(Number(response.list[i].dt) * 1000);
+                 console.log(js_d.toLocaleString(),
+                     response.list[i].main.temp,
+                     response.list[i].main.humidity,
+                     response.list[i].main.temp_min,
+                     response.list[i].main.temp_max);
+             }
+
+            // Start searching forecast data with current date so that when forecast date changes
+            // we know we haved moved into forecast data for the next day.
+            var searchDate = moment().format("l");
+
+            //var forecastDateTime = "";
+            //var compareDate = "";
+            //var saveForecastDate = "";
+            //var pos_comma = 0;
+            //var searchTime = "";
+            var searchForTime = false;
+            var idx = 0;
+
+            do  {
+                var js_d = new Date(Number(response.list[idx].dt) * 1000);
+                var forecastDateTime = js_d.toLocaleString();
+                var pos_comma = forecastDateTime.indexOf(",");
+                var compareDate = forecastDateTime.slice(0, pos_comma);
+                //console.log("compare date: ", compareDate);
+                //console.log("search date: ", searchDate);
+                if (compareDate !== searchDate) {
+                    var saveForecastDate = compareDate;
+                    searchDate = compareDate;
+                    searchForTime = true;
+                } else {
+                    if (searchForTime) {
+                        var searchTime = forecastDateTime.slice(11);
+                        if (searchTime === "2:00:00 PM") {
+                            var newForecast = new Forecast(
+                                saveForecastDate,
+                                response.list[idx].weather[0].icon,
+                                response.list[idx].main.temp,
+                                response.list[idx].main.humidity
+                            );
+                            fiveDayForecast.push(newForecast); 
+                        }
+                    }
+                }
+                idx++
+            } while (idx < response.cnt);
+
+            console.log(fiveDayForecast);
+        
             var forecastRow = $("<div>").addClass("row h4");
             forecastRow.text("5-Day Forecast:");
 
-            //   var forecastRowTitle = $("<p>").addClass("h4");
-            //   forecastRowTitle.text("5-Day Forecast:")
-            //   forecastRow.append(forecastRowTitle);
-
             $currentWeather.append(forecastRow);
-
-            //------------------------------------
-            // loop will start here
-            //------------------------------------
 
             // DAY 1
 
             var forecastDay1 = $("<div>").addClass("forecast-box");
 
-            createForecastDay(forecastDay1, 7, response);
+            //createForecastDay(forecastDay1, 7, response);  15, 23, 31, 39
+
+            createForecastDay(forecastDay1, fiveDayForecast[0]);
 
             // DAY-2
 
             var forecastDay2 = $("<div>").addClass("forecast-box");
 
-            createForecastDay(forecastDay2, 15, response);
+            createForecastDay(forecastDay2, fiveDayForecast[1]);
 
             // DAY-3
 
             var forecastDay3 = $("<div>").addClass("forecast-box");
 
-            createForecastDay(forecastDay3, 23, response);
+            createForecastDay(forecastDay3, fiveDayForecast[2]);
 
             // DAY-4
 
             var forecastDay4 = $("<div>").addClass("forecast-box");
 
-            createForecastDay(forecastDay4, 31, response);
+            createForecastDay(forecastDay4, fiveDayForecast[3]);
 
             // DAY-5
 
             var forecastDay5 = $("<div>").addClass("forecast-box");
 
-            createForecastDay(forecastDay5, 39, response);
-
-
-            // for (let i = 0; i < 40; i++) {
-            //     //for (let i = 7; i < 40; i = i + 8) {
-            //     var d = new Date(Number(response.list[i].dt) * 1000);
-            //     console.log(d.toLocaleString(), response.list[i].main.temp, response.list[i].main.humidity,
-            //         response.list[i].main.temp_min, response.list[i].main.temp_max);
-            // }
+            createForecastDay(forecastDay5, fiveDayForecast[4]);
 
             $currentWeather.append(forecastDay1, forecastDay2, forecastDay3, forecastDay4, forecastDay5);
 
         });
-
     }
 
-    function createForecastDay(forecastDay, idx, resp) {
+
+    // Constructor for 5-day forecast objects
+    function Forecast(fcDate, fcIcon, fcTemp, fcHumidity) {
+        this.forecastDate     = fcDate;
+        this.forecastIcon     = fcIcon;
+        this.forecastTemp     = fcTemp;
+        this.forecastHumidity = fcHumidity;
+    }
+
+
+    function createForecastDay(forecastDay, forecast) {
 
         var forecastDate = $("<p>");
 
-        var js_date = new Date(Number(resp.list[idx].dt) * 1000);
-        //console.log(d.toLocaleDateString());
-        forecastDate.text(js_date.toLocaleDateString());
+        forecastDate.text(forecast.forecastDate);
         forecastDay.append(forecastDate);
 
         var forecastIcon = $("<img>");
         forecastIcon.attr(
             "src",
-            "https://openweathermap.org/img/w/" + resp.list[idx].weather[0].icon + ".png"
+            "https://openweathermap.org/img/w/" + forecast.forecastIcon + ".png"
         );
         forecastDay.append(forecastIcon);
 
         var forecastTemp = $("<p>");
-        forecastTemp.text("Temp: " + resp.list[idx].main.temp + " \u00B0F");
+        forecastTemp.text("Temp: " + forecast.forecastTemp + " \u00B0F");
         forecastDay.append(forecastTemp);
 
         var forecastHumidity = $("<p>");
-        forecastHumidity.text("Humidity: " + resp.list[idx].main.humidity + "%");
+        forecastHumidity.text("Humidity: " + forecast.forecastHumidity + "%");
         forecastDay.append(forecastHumidity);
     }
 
+    // var js_date = new Date(Number(resp.list[idx].dt) * 1000);
+    // //console.log(d.toLocaleDateString());
+    // forecastDate.text(js_date.toLocaleDateString());
+    // forecastDay.append(forecastDate);
 
+    // var forecastIcon = $("<img>");
+    // forecastIcon.attr(
+    //     "src",
+    //     "https://openweathermap.org/img/w/" + resp.list[idx].weather[0].icon + ".png"
+    // );
+    // forecastDay.append(forecastIcon);
+
+    // var forecastTemp = $("<p>");
+    // forecastTemp.text("Temp: " + resp.list[idx].main.temp + " \u00B0F");
+    // forecastDay.append(forecastTemp);
+
+    // var forecastHumidity = $("<p>");
+    // forecastHumidity.text("Humidity: " + resp.list[idx].main.humidity + "%");
+    // forecastDay.append(forecastHumidity);
  
 });
 
