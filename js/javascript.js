@@ -283,7 +283,7 @@ $(document).ready(function () {
              }
 
             // Start searching forecast data with current date so that when forecast date changes
-            // we know we haved moved into forecast data for the next day.
+            // we know we have moved into forecast data for the next day.
             var searchDate = moment().format("l");
 
             //var forecastDateTime = "";
@@ -299,8 +299,7 @@ $(document).ready(function () {
                 var forecastDateTime = js_d.toLocaleString();
                 var pos_comma = forecastDateTime.indexOf(",");
                 var compareDate = forecastDateTime.slice(0, pos_comma);
-                //console.log("compare date: ", compareDate);
-                //console.log("search date: ", searchDate);
+                //console.log("compare date: ", compareDate, " search date: ", searchDate);
                 if (compareDate !== searchDate) {
                     var saveForecastDate = compareDate;
                     searchDate = compareDate;
@@ -321,6 +320,18 @@ $(document).ready(function () {
                 }
                 idx++
             } while (idx < response.cnt);
+
+            // need to save last entry in response array as the fifth entry in 5-day forecast
+            // if inquiring before 2 pm.
+            if (fiveDayForecast.length < 5) {
+                var newForecast = new Forecast(
+                    compareDate,
+                    response.list[39].weather[0].icon,
+                    response.list[39].main.temp,
+                    response.list[39].main.humidity
+                );
+                fiveDayForecast.push(newForecast); 
+            }
 
             console.log(fiveDayForecast);
         
@@ -421,7 +432,6 @@ $(document).ready(function () {
  
 });
 
-
     //var d = new Date();
     //console.log(typeof d);
     //var n = d.toLocaleDateString();
@@ -437,10 +447,3 @@ $(document).ready(function () {
     //<button type="button" class="list-group-item list-group-item-action">Phoenix</button>
     //const date = new Date(1582059600000).toDateString();
     //console.log(date);
-
-            //   Forecast: 
-        //var queryURL = 
-        // "http://api.openweathermap.org/data/2.5/forecast?id=" + cityID + "&units=imperial&appid=" +
-        // + APIKey;
-
-        //   Icon: "http://openweathermap.org/img/w/" + data.list[i].weather[0].icon + ".png"
