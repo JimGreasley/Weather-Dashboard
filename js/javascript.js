@@ -8,13 +8,15 @@ $(document).ready(function () {
 
     // This is my API key.
     var APIKey = "7514abfe02ab6db7877685958ec119d7";
+    //var goodAJAXcall = true;
 
     // get Weather Cities history data from local storage
+    //localStorage.removeItem("WeatherCities");
 
     var data = localStorage.getItem("WeatherCities");
 
     if (!data) {
-        // create new 'empty' Work Day Schedule array
+        // create new 'empty' Weather Cities array
         var weather_cities = [];
         //var weather_cities = ["Phoenix", "Los Angeles", "Seattle"];
     } else {
@@ -22,7 +24,7 @@ $(document).ready(function () {
     }
 
     // add each city in weather_cities array to history list group
-    weather_cities.forEach(loadCity);
+       weather_cities.forEach(loadCity);
 
 
     // set Event to save text when corresponding save button is clicked
@@ -38,14 +40,20 @@ $(document).ready(function () {
             $(".invalid-feedback").addClass("d-block");
             event.stopPropagation();
         } else {
+            // should also convert it to lowercase and then capitalize the first character
             var searchCity = $("#search-city")
                 .val()
                 .trim();
-            //console.log("city: ", searchCity);
-            getCurrentWeather(searchCity);
-            saveSearchCity(searchCity);
-            //should clear search-city  and re-display city list 
-            //not this now! window.location.href = "index.html";
+            if (searchCity === "clear") {
+                // clear out (empty) the Weather Cities array and save in local storage
+                //var weather_cities = [];
+                localStorage.removeItem("WeatherCities");
+                //localStorage.setItem("WeatherCities", JSON.stringify(weather_cities));
+            } else {
+                //console.log("city: ", searchCity);
+                getCurrentWeather(searchCity);
+            }
+
         }
 
     });
@@ -55,37 +63,63 @@ $(document).ready(function () {
     //   exist, and to save the updated history in local storage. 
     //-----------------------------------------------------------------------------------------
 
-    function saveSearchCity(srchCity) {
+    function saveSearchCity(cityName, cityID) {
 
-        // search weather_cities array for the current search city
+        // search weather_cities array for the current search city name
         // if not found then add it to the array
         // save weather_cities array in local storage
+        console.log("Save Srch City");
+        var cityIndex = -1;
+        weather_cities.forEach(checkForCity);
 
-        var add_city_to_history = true;
-        for (let i = 0; i < weather_cities.length; i++) {
-            if (srchCity === weather_cities[i]) {
-                add_city_to_history = false;
+        function checkForCity(cityEntry, index) {
+            if (cityEntry.name === cityName) {
+                // current city already exists in weather_cities array
+                cityIndex = index;
             }
         }
+        console.log("cityIndex: ", cityIndex);
 
-        if (add_city_to_history) {
-            console.log("adding search city " + srchCity + " to history");
-            weather_cities.push(srchCity);
-            // Save updated work_day_schedule array in local storage
+        // City not already in weather_cities history array so add it 
+        if (cityIndex === -1) {
+            // create a new city object
+            var newCity = new City(cityName, cityID);
+            console.log("New city obj: ", newCity);
+            // Add new city to weather cities array
+            console.log("adding search city " + cityName + " to history");
+            weather_cities.push(newCity);
+            // Save updated weather_cities array in local storage
             localStorage.setItem("WeatherCities", JSON.stringify(weather_cities));
         }
     }
+
+        // var add_city_to_history = true;
+        // for (let i = 0; i < weather_cities.length; i++) {
+        //     if (srchCity === weather_cities[i]) {
+        //         add_city_to_history = false;
+        //     }
+        // }
+
+
+    // Constructor function for City objects in Weather Cities array
+
+    function City(cityName, cityID) {
+        this.name = cityName;
+        this.id   = cityID;
+}
 
     //-----------------------------------------------------------------------------------------
     //  function to create a group list of city names from previous search history 
     //-----------------------------------------------------------------------------------------
 
-    function loadCity(cityName) {
+    function loadCity(cityObj) {
 
+        console.log(cityObj);
         var newListItem = $("<button>").addClass("list-group-item list-group-item-action");
         newListItem.attr("type", "button");
+        newListItem.attr("data-id", cityObj.id);
         //newListItem.attr("id", "city-list");
-        newListItem.text(cityName);
+        newListItem.text(cityObj.name);
 
         // Append the city from history list to page (Container element)
         $cityHistory.append(newListItem);
@@ -118,20 +152,21 @@ $(document).ready(function () {
 
 
 
-    function getCurrentWeather(city) {
+    function getCurrentWeather(cityName) {
 
         // clear current weather area before displaying any new data
         $currentWeather.empty();
 
         // set up the AJAX query URL
+        goodAJAXcall = true;
 
-        console.log("Search for city: ", city);
+        console.log("Search for city: ", cityName);
         //console.log(moment().format("l"));
         //return;
 
         var queryURL =
             "https://api.openweathermap.org/data/2.5/weather?q=" +
-            city +
+            cityName +
             "&units=imperial&appid="
             + APIKey;
 
@@ -179,6 +214,16 @@ $(document).ready(function () {
 
             getUVIndex(cityID, latitude, longitude);
 
+            // expand this to save city name and cityID in array of objects
+                saveSearchCity(cityName, cityID);
+            //} 
+            //should clear search-city  and re-display city list 
+            //not this now! window.location.href = "index.html";
+
+        })
+        .catch(function(err){
+            //goodAJAXcall = false;
+            console.log("AJAX error: ", err);
         });
     }
 
@@ -271,20 +316,21 @@ $(document).ready(function () {
             url: queryURL,
             method: "GET"
         }).then(function (response) {
-            console.log(response);
+            //console.log(response);
 
-             for (let i = 0; i < response.cnt; i++) {
-                 var js_d = new Date(Number(response.list[i].dt) * 1000);
-                 console.log(js_d.toLocaleString(),
-                     response.list[i].main.temp,
-                     response.list[i].main.humidity,
-                     response.list[i].main.temp_min,
-                     response.list[i].main.temp_max);
-             }
+            //  for (let i = 0; i < response.cnt; i++) {
+            //      var js_d = new Date(Number(response.list[i].dt) * 1000);
+            //      console.log(js_d.toLocaleString(),
+            //          response.list[i].main.temp,
+            //          response.list[i].main.humidity,
+            //          response.list[i].main.temp_min,
+            //          response.list[i].main.temp_max);
+            //  }
 
             // Start searching forecast data with current date so that when forecast date changes
             // we know we have moved into forecast data for the next day.
             var searchDate = moment().format("l");
+            console.log(searchDate);
 
             //var forecastDateTime = "";
             //var compareDate = "";
@@ -295,18 +341,24 @@ $(document).ready(function () {
             var idx = 0;
 
             do  {
+                // convert forecast date-time into a js date and then to human readable format
                 var js_d = new Date(Number(response.list[idx].dt) * 1000);
                 var forecastDateTime = js_d.toLocaleString();
+                //console.log("forecast DateTime ", forecastDateTime);
+                // isolate date portion (mm/dd/yyyy) from begining of date string
                 var pos_comma = forecastDateTime.indexOf(",");
                 var compareDate = forecastDateTime.slice(0, pos_comma);
                 //console.log("compare date: ", compareDate, " search date: ", searchDate);
                 if (compareDate !== searchDate) {
+                    // the forecast data has changed to a new day, so replace the
+                    // search date with the new forecast date and trigger search based on time
                     var saveForecastDate = compareDate;
                     searchDate = compareDate;
                     searchForTime = true;
                 } else {
                     if (searchForTime) {
-                        var searchTime = forecastDateTime.slice(11);
+                        // isolate the time portion of the
+                        var searchTime = forecastDateTime.slice(pos_comma + 2);
                         if (searchTime === "2:00:00 PM") {
                             var newForecast = new Forecast(
                                 saveForecastDate,
