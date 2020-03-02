@@ -4,11 +4,11 @@ $(document).ready(function () {
     // Global variables
     // Capture selector for HTML area to hold current weather data  
     var $currentWeather = $("#current-weather");
+    var $searchCity = $("#search-city");
     var $cityHistory = $("#city-history");
 
     // This is my API key.
     var APIKey = "7514abfe02ab6db7877685958ec119d7";
-    //var goodAJAXcall = true;
 
     // get Weather Cities history data from local storage
     //localStorage.removeItem("WeatherCities");
@@ -27,21 +27,21 @@ $(document).ready(function () {
        weather_cities.forEach(loadCity);
 
 
-    // set Event to save text when corresponding save button is clicked
-    $("#city-history").click(selectCity);
-
+    // set Event to select specific city when that city, in the history list, is clicked
+    //$cityHistory.click(selectCity);
+    $(".list-group-item").click(selectCity);
 
     // save button calls
     $("#searchBtn").on("click", function (event) {
         event.preventDefault();
         // validate search params
-        if ($("#search-city").val() === "") {
+        if ($searchCity.val() === "") {
             $(".invalid-feedback").removeClass("d-none");
             $(".invalid-feedback").addClass("d-block");
             event.stopPropagation();
         } else {
             // should also convert it to lowercase and then capitalize the first character
-            var searchCity = $("#search-city")
+            var searchCity = $searchCity
                 .val()
                 .trim();
             if (searchCity === "clear") {
@@ -51,7 +51,7 @@ $(document).ready(function () {
                 //localStorage.setItem("WeatherCities", JSON.stringify(weather_cities));
             } else {
                 //console.log("city: ", searchCity);
-                getCurrentWeather(searchCity);
+                getCurrentWeather(searchCity, null);
             }
 
         }
@@ -90,16 +90,13 @@ $(document).ready(function () {
             weather_cities.push(newCity);
             // Save updated weather_cities array in local storage
             localStorage.setItem("WeatherCities", JSON.stringify(weather_cities));
+            // clear out city history and reload to include city just added
+            $cityHistory.empty();
+            // add each city in weather_cities array to history list group
+            weather_cities.forEach(loadCity);
+
         }
     }
-
-        // var add_city_to_history = true;
-        // for (let i = 0; i < weather_cities.length; i++) {
-        //     if (srchCity === weather_cities[i]) {
-        //         add_city_to_history = false;
-        //     }
-        // }
-
 
     // Constructor function for City objects in Weather Cities array
 
@@ -117,7 +114,7 @@ $(document).ready(function () {
         console.log(cityObj);
         var newListItem = $("<button>").addClass("list-group-item list-group-item-action");
         newListItem.attr("type", "button");
-        newListItem.attr("data-id", cityObj.id);
+        newListItem.attr("data-cityId", cityObj.id);
         //newListItem.attr("id", "city-list");
         newListItem.text(cityObj.name);
 
@@ -133,42 +130,41 @@ $(document).ready(function () {
     function selectCity(e) {
         event.preventDefault();
 
-        //console.log($(this).siblings(".textarea").val());
-        //console.log($(this).attr("data-index"));
-        console.log($(this).text());
-
         // capture index (typeof 'string') into work-day-schedule array 
-        //var idx = $(this).attr("index");
-        //console.log(typeof idx);
+        var saveCityId  = $(this).attr("data-cityId");
+        var saveCityName = $(this).text();
+        console.log(saveCityId, saveCityName);
 
-        // save updated text in work_day_schedule array
-        //work_day_schedule[parseInt(idx)] = $(this).siblings(".textarea").val();
-
-        // Save updated work_day_schedule array in local storage
-        //localStorage.setItem("WorkDaySchedule", JSON.stringify(work_day_schedule));
+        getCurrentWeather(saveCityName, saveCityId);
 
     }
 
 
 
 
-    function getCurrentWeather(cityName) {
+    function getCurrentWeather(cityName, cityId) {
 
         // clear current weather area before displaying any new data
         $currentWeather.empty();
 
         // set up the AJAX query URL
-        goodAJAXcall = true;
 
-        console.log("Search for city: ", cityName);
-        //console.log(moment().format("l"));
-        //return;
-
-        var queryURL =
+        if (cityId === null) {
+            console.log("Search for city: ", cityName);
+            var queryURL =
             "https://api.openweathermap.org/data/2.5/weather?q=" +
             cityName +
             "&units=imperial&appid="
             + APIKey;
+        } 
+        else {
+            console.log("Search for city ID: ", cityId);
+            var queryURL =
+            "https://api.openweathermap.org/data/2.5/weather?id=" +
+            cityId +
+            "&units=imperial&appid="
+            + APIKey;
+        }
 
         // AJAX call
 
@@ -177,7 +173,9 @@ $(document).ready(function () {
             method: "GET"
         }).then(function (response) {
             console.log(response);
-            //return;
+            
+            // clear out the search city buffer
+            // $searchCity.val() = " ";
 
             var latitude = response.coord.lat;
             var longitude = response.coord.lon;
@@ -215,14 +213,10 @@ $(document).ready(function () {
             getUVIndex(cityID, latitude, longitude);
 
             // expand this to save city name and cityID in array of objects
-                saveSearchCity(cityName, cityID);
-            //} 
-            //should clear search-city  and re-display city list 
-            //not this now! window.location.href = "index.html";
+            saveSearchCity(cityName, cityID);
 
         })
         .catch(function(err){
-            //goodAJAXcall = false;
             console.log("AJAX error: ", err);
         });
     }
