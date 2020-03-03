@@ -26,13 +26,14 @@ $(document).ready(function () {
     weather_cities.forEach(loadCity);
 
     // use last city in weather_cities array to display weather on initial load 
-    var lastCity = weather_cities[weather_cities.length - 1];
+    if (weather_cities.length > 0) {
+        var lastCity    = weather_cities[weather_cities.length - 1];
+        var lastCityId  = lastCity.id;
+        var lastCityName = lastCity.name;
+        //console.log(saveCityId, saveCityName);
+        getCurrentWeather(lastCityName, lastCityId);
+    }
 
-    var lastCityId  = lastCity.id;
-    var lastCityName = lastCity.name;
-    //console.log(saveCityId, saveCityName);
-
-    getCurrentWeather(lastCityName, lastCityId);
 
     // set Event to select specific city when that city, in the history list, is clicked
     //$cityHistory.click(selectCity);
@@ -54,6 +55,8 @@ $(document).ready(function () {
             if (searchCity === "clear") {
                 // remove (clear out) the Weather Cities array from local storage
                 localStorage.removeItem("WeatherCities");
+                // reload the main page
+                window.location.href = "index.html";
             } else {
                 //console.log("city: ", searchCity);
                 getCurrentWeather(searchCity, null);
