@@ -18,20 +18,27 @@ $(document).ready(function () {
     if (!data) {
         // create new 'empty' Weather Cities array
         var weather_cities = [];
-        //var weather_cities = ["Phoenix", "Los Angeles", "Seattle"];
     } else {
         var weather_cities = JSON.parse(data);
     }
 
     // add each city in weather_cities array to history list group
-       weather_cities.forEach(loadCity);
+    weather_cities.forEach(loadCity);
 
+    // use last city in weather_cities array to display weather on initial load 
+    var lastCity = weather_cities[weather_cities.length - 1];
+
+    var lastCityId  = lastCity.id;
+    var lastCityName = lastCity.name;
+    //console.log(saveCityId, saveCityName);
+
+    getCurrentWeather(lastCityName, lastCityId);
 
     // set Event to select specific city when that city, in the history list, is clicked
     //$cityHistory.click(selectCity);
     $(".list-group-item").click(selectCity);
 
-    // save button calls
+    // set Event for click of search button
     $("#searchBtn").on("click", function (event) {
         event.preventDefault();
         // validate search params
@@ -45,15 +52,12 @@ $(document).ready(function () {
                 .val()
                 .trim();
             if (searchCity === "clear") {
-                // clear out (empty) the Weather Cities array and save in local storage
-                //var weather_cities = [];
+                // remove (clear out) the Weather Cities array from local storage
                 localStorage.removeItem("WeatherCities");
-                //localStorage.setItem("WeatherCities", JSON.stringify(weather_cities));
             } else {
                 //console.log("city: ", searchCity);
                 getCurrentWeather(searchCity, null);
             }
-
         }
 
     });
@@ -130,7 +134,7 @@ $(document).ready(function () {
     function selectCity(e) {
         event.preventDefault();
 
-        // capture index (typeof 'string') into work-day-schedule array 
+        // get weather for city corresponding to history entry that was clicked 
         var saveCityId  = $(this).attr("data-cityId");
         var saveCityName = $(this).text();
         console.log(saveCityId, saveCityName);
