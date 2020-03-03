@@ -15,6 +15,8 @@ If a city name is input and the search button clicked the program makes three AJ
 
 After the weather data has been displayed for a city, it will be saved in the history array (if it doesn't already exist in the array) and the updated history array is stored, in JSON format, in local storage.
 
+Using a city name of "clear" in the search field will delete the city history array, allowing for a fresh start.
+
 
 
 ## Link
