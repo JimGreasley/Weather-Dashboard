@@ -19,7 +19,24 @@
     <div class="container-fluid" id="search-history">
         <div class="row">
             <div class="col-4">
-                <div class="row">
+                <div class="card-deck">
+                    <div class="card" style="width: 12rem;">
+                        <div class="card-body">
+                          <h5 class="card-title">Search for a City:</h5>
+                          <div class="input-group mb-3">
+                            <input type="text" class="form-control" id="search-city" aria-label="City's name"
+                                aria-describedby="button-addon2">
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary" type="button" id="searchBtn">Button</button>
+                            </div>
+                          </div>
+                          <div class="list-group" id="city-history">
+                            <!-- <button type="button" class="list-group-item list-group-item-action">Phoenix</button> -->
+                          </div>
+                        </div>
+                    </div>
+
+                <!-- <div class="row">
                     <h5>Search for a City:</h5>
                     <div class="input-group mb-3">
                         <input type="text" class="form-control" id="search-city" aria-label="City's name"
@@ -28,11 +45,13 @@
                             <button class="btn btn-outline-secondary" type="button" id="searchBtn">Button</button>
                         </div>
                     </div>
-                </div>
-                <div class="row">
+                </div> -->
+                <!-- <div class="row">
                     <div class="list-group" id="city-history">
-                        <!-- <button type="button" class="list-group-item list-group-item-action">Phoenix</button> -->
+                        <!-- <button type="button" class="list-group-item list-group-item-action">Phoenix</button>
                     </div>
+                </div> -->
+
                 </div>
             </div>
             <div class="col-8" id="current-weather">
