@@ -102,6 +102,8 @@ $(document).ready(function () {
             $cityHistory.empty();
             // add each city in weather_cities array to history list group
             weather_cities.forEach(loadCity);
+            // set Event to select specific city when that city, in the history list, is clicked
+            $(".list-group-item").click(selectCity);
 
         }
     }
@@ -189,7 +191,7 @@ $(document).ready(function () {
             console.log(response);
             
             // clear out the search city buffer
-            // $searchCity.val() = " ";
+            $searchCity.val('');
 
             var latitude = response.coord.lat;
             var longitude = response.coord.lon;
