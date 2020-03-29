@@ -104,7 +104,6 @@ $(document).ready(function () {
             weather_cities.forEach(loadCity);
             // set Event to select specific city when that city, in the history list, is clicked
             $(".list-group-item").click(selectCity);
-
         }
     }
 
