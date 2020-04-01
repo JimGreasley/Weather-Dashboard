@@ -1,0 +1,25 @@
+{
+  "name": "Weather-Dashboard",
+  "version": "1.0.0",
+  "description": "The current WeatherCities history, in JSON format, is retrieved from local storage.\r If no data is returned then an empty weather_cities array is created.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JimGreasley/Weather-Dashboard.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JimGreasley/Weather-Dashboard/issues"
+  },
+  "homepage": "https://github.com/JimGreasley/Weather-Dashboard#readme",
+  "dependencies": {
+    "axios": "^0.19.2",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1"
+  }
+}

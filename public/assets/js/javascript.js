@@ -7,8 +7,6 @@ $(document).ready(function () {
     var $searchCity = $("#search-city");
     var $cityHistory = $("#city-history");
 
-    // This is my API key.
-    var APIKey = "7514abfe02ab6db7877685958ec119d7";
 
     // testing - delete Weather Cities history data from local storage
     //localStorage.removeItem("WeatherCities");
@@ -27,8 +25,8 @@ $(document).ready(function () {
 
     // use last city in weather_cities array to display weather on initial load 
     if (weather_cities.length > 0) {
-        var lastCity    = weather_cities[weather_cities.length - 1];
-        var lastCityId  = lastCity.id;
+        var lastCity = weather_cities[weather_cities.length - 1];
+        var lastCityId = lastCity.id;
         var lastCityName = lastCity.name;
         //console.log(saveCityId, saveCityName);
         getCurrentWeather(lastCityName, lastCityId);
@@ -113,8 +111,8 @@ $(document).ready(function () {
 
     function City(cityName, cityID) {
         this.name = cityName;
-        this.id   = cityID;
-}
+        this.id = cityID;
+    }
 
     //-----------------------------------------------------------------------------------------
     //  function to create a group list of city names from previous search history 
@@ -142,7 +140,7 @@ $(document).ready(function () {
         event.preventDefault();
 
         // get weather for city corresponding to history entry that was clicked 
-        var saveCityId  = $(this).attr("data-cityId");
+        var saveCityId = $(this).attr("data-cityId");
         var saveCityName = $(this).text();
         console.log(saveCityId, saveCityName);
 
@@ -166,19 +164,11 @@ $(document).ready(function () {
 
         if (cityId === null) {
             console.log("Search for city: ", cityName);
-            var queryURL =
-            "https://api.openweathermap.org/data/2.5/weather?q=" +
-            cityName +
-            "&units=imperial&appid="
-            + APIKey;
-        } 
+            var queryURL = "/api/weather/name/" + cityName;
+        }
         else {
             console.log("Search for city ID: ", cityId);
-            var queryURL =
-            "https://api.openweathermap.org/data/2.5/weather?id=" +
-            cityId +
-            "&units=imperial&appid="
-            + APIKey;
+            var queryURL = "/api/weather/id/" + cityId;
         }
 
         // AJAX call
@@ -188,7 +178,7 @@ $(document).ready(function () {
             method: "GET"
         }).then(function (response) {
             console.log(response);
-            
+
             // clear out the search city buffer
             $searchCity.val('');
 
@@ -254,9 +244,9 @@ $(document).ready(function () {
             saveSearchCity(cityName, cityID);
 
         })
-        .catch(function(err){
-            console.log("AJAX error: ", err);
-        });
+            .catch(function (err) {
+                console.log("AJAX error: ", err);
+            });
     }
 
 
@@ -272,11 +262,7 @@ $(document).ready(function () {
         console.log("Get UV Index for lat (" + lat + ") and lon (" + lon + ")");
         //return;
 
-        var queryURL =
-            "https://api.openweathermap.org/data/2.5/uvi?appid=" +
-            APIKey
-            +
-            "&units=imperial&lat=" + lat + "&lon=" + lon;
+        var queryURL = "/api/weather/coord/" + lat + "/" + lon;
 
         $.ajax({
             url: queryURL,
@@ -317,7 +303,7 @@ $(document).ready(function () {
 
             var colUvIndexVal = $("<div>").addClass("col-1");
             colUvIndexVal.append(uvIndexSpan);
-            
+
             uvIndexRow.append(colUvIndexLit, colUvIndexVal);
 
             $currentWeather.append(uvIndexRow);
@@ -343,10 +329,7 @@ $(document).ready(function () {
         console.log("Geting forecast for city ID: " + cityID);
         //console.log(moment().format("l"));
 
-        var queryURL =
-            "https://api.openweathermap.org/data/2.5/forecast?id=" + cityID +
-            "&units=imperial&appid=" +
-            APIKey;
+        var queryURL = "/api/weather/forecast/id/" + cityID;
 
         $.ajax({
             url: queryURL,
@@ -376,7 +359,7 @@ $(document).ready(function () {
             var searchForTime = false;
             var idx = 0;
 
-            do  {
+            do {
                 // convert forecast date-time into a js date and then to human readable format
                 var js_d = new Date(Number(response.list[idx].dt) * 1000);
                 var forecastDateTime = js_d.toLocaleString();
@@ -420,7 +403,7 @@ $(document).ready(function () {
                     response.list[39].main.temp,
                     response.list[39].main.humidity
                 );
-                fiveDayForecast.push(newForecast); 
+                fiveDayForecast.push(newForecast);
             }
 
             console.log(fiveDayForecast);
@@ -481,9 +464,9 @@ $(document).ready(function () {
     // Constructor for 5-day forecast objects
     //------------------------------------------------------
     function Forecast(fcDate, fcIcon, fcTemp, fcHumidity) {
-        this.forecastDate     = fcDate;
-        this.forecastIcon     = fcIcon;
-        this.forecastTemp     = fcTemp;
+        this.forecastDate = fcDate;
+        this.forecastIcon = fcIcon;
+        this.forecastTemp = fcTemp;
         this.forecastHumidity = fcHumidity;
     }
 
