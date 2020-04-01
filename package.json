@@ -4,7 +4,7 @@
   "description": "The current WeatherCities history, in JSON format, is retrieved from local storage.\r If no data is returned then an empty weather_cities array is created.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js"
   },
   "repository": {
     "type": "git",
