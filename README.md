@@ -18,6 +18,11 @@ After the weather data has been displayed for a city, it will be saved in the hi
 Using a city name of "clear" in the search field will delete the city history array, allowing for a fresh start.
 
 
+## Technology used
+Bootstrap, jQuery, Momemtjs, AJAX and axios for api call to 'openweathermap.org'
 
-## Link
-https://jimgreasley.github.io/Weather-Dashboard/
+## GitHub Code
+https://github.com/JimGreasley/Weather-Dashboard
+
+## Heroku deployment
+https://rhubarb-crumble-97219.herokuapp.com/

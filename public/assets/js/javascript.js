@@ -34,7 +34,6 @@ $(document).ready(function () {
 
 
     // set Event to select specific city when that city, in the history list, is clicked
-    //$cityHistory.click(selectCity);
     $(".list-group-item").click(selectCity);
 
     // set Event for click of search button
@@ -124,7 +123,6 @@ $(document).ready(function () {
         var newListItem = $("<button>").addClass("list-group-item list-group-item-action");
         newListItem.attr("type", "button");
         newListItem.attr("data-cityId", cityObj.id);
-        //newListItem.attr("id", "city-list");
         newListItem.text(cityObj.name);
 
         // Append the city from history list to page (Container element)
@@ -145,9 +143,7 @@ $(document).ready(function () {
         console.log(saveCityId, saveCityName);
 
         getCurrentWeather(saveCityName, saveCityId);
-
     }
-
 
 
     //-------------------------------------------------------------------------------------
@@ -270,7 +266,6 @@ $(document).ready(function () {
         }).then(function (response) {
             //console.log(response);
             //var now = moment().format("MMMM Do, YYYY");
-            //console.log(response.value);
 
             var uvIndexRow = $("<div>").addClass("row");
 
