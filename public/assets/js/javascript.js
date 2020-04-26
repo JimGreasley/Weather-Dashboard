@@ -206,7 +206,7 @@ $(document).ready(function () {
             var colTempLit = $("<div>").addClass("col-2");
             colTempLit.text("Temperature:");
             var colTempVal = $("<div>").addClass("col-2");
-            colTempVal.text(response.main.temp + " \u00B0F");
+            colTempVal.text(response.main.temp.toFixed(0) + " \u00B0F");
             tempRow.append(colTempLit, colTempVal);
 
             $currentWeather.append(tempRow);
@@ -217,7 +217,7 @@ $(document).ready(function () {
             var colHumLit = $("<div>").addClass("col-2");
             colHumLit.text("Humidity:");
             var colHumVal = $("<div>").addClass("col-2");
-            colHumVal.text(response.main.humidity + "%");
+            colHumVal.text(response.main.humidity + " %");
             humidityRow.append(colHumLit, colHumVal);
 
             $currentWeather.append(humidityRow);
@@ -228,7 +228,7 @@ $(document).ready(function () {
             var colWindLit = $("<div>").addClass("col-2");
             colWindLit.text("Wind Speed:");
             var colWindVal = $("<div>").addClass("col-2");
-            colWindVal.text(response.wind.speed + "MPH");
+            colWindVal.text(response.wind.speed.toFixed(0) + " mph");
             windSpeedRow.append(colWindLit, colWindVal);
 
             $currentWeather.append(windSpeedRow);
@@ -267,13 +267,16 @@ $(document).ready(function () {
             //console.log(response);
             //var now = moment().format("MMMM Do, YYYY");
 
+            // need UV Index as number for strength comparisons below
+            var uvIndexNum = Number(response.value);
+            console.log("UV Index number: ", uvIndexNum);
+
             var uvIndexRow = $("<div>").addClass("row");
 
             var uvIndexSpan = $("<span>").attr("id", "uv-intensity");
-            uvIndexSpan.text(response.value);
+            //uvIndexSpan.text(response.value);
 
-            var uvIndexNum = Number(response.value);
-            console.log("UV Index number: ", uvIndexNum);
+            uvIndexSpan.text(uvIndexNum.toFixed(1));
 
             // add class to UV Index to indicate whether value is low, medium, high or severe
             if (uvIndexNum < 3) {
@@ -359,7 +362,7 @@ $(document).ready(function () {
                 var js_d = new Date(Number(response.list[idx].dt) * 1000);
                 var forecastDateTime = js_d.toLocaleString();
                 //console.log("forecast DateTime ", forecastDateTime);
-                // isolate date portion (mm/dd/yyyy) from begining of forecast 'date+time' string
+                // isolate date portion (mm/dd/yyyy) from beginning of forecast 'date+time' string
                 var pos_comma = forecastDateTime.indexOf(",");
                 var compareDate = forecastDateTime.slice(0, pos_comma);
                 //console.log("compare date: ", compareDate, " search date: ", searchDate);
@@ -484,11 +487,11 @@ $(document).ready(function () {
         forecastDay.append(forecastIcon);
 
         var forecastTemp = $("<p>");
-        forecastTemp.text("Temp: " + forecast.forecastTemp + " \u00B0F");
+        forecastTemp.text("Temp: " + forecast.forecastTemp.toFixed(0) + " \u00B0F");
         forecastDay.append(forecastTemp);
 
         var forecastHumidity = $("<p>");
-        forecastHumidity.text("Humidity: " + forecast.forecastHumidity + "%");
+        forecastHumidity.text("Humidity: " + forecast.forecastHumidity + " %");
         forecastDay.append(forecastHumidity);
     }
 
