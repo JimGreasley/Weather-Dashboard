@@ -356,6 +356,12 @@ $(document).ready(function () {
             //var searchTime = "";
             var searchForTime = false;
             var idx = 0;
+            // During summer use match time of 5 pm for Phoenix & Chandler. That is the hotest part of the day.
+            if (response.city.name === "Chandler" || response.city.name === "Phoenix") {
+                var matchTime = "5:00:00 PM";
+            } else {
+                var matchTime = "2:00:00 PM";
+            }
 
             do {
                 // convert forecast date-time into a js date and then to human readable format
@@ -376,7 +382,7 @@ $(document).ready(function () {
                     if (searchForTime) {
                         // isolate the time portion from end of forecast 'date+time' string
                         var searchTime = forecastDateTime.slice(pos_comma + 2);
-                        if (searchTime === "2:00:00 PM") {
+                        if (searchTime === matchTime) {
                             var newForecast = new Forecast(
                                 saveForecastDate,
                                 response.list[idx].weather[0].icon,
