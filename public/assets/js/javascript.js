@@ -383,8 +383,11 @@ $(document).ready(function () {
                         // isolate the time portion from end of forecast 'date+time' string
                         var searchTime = forecastDateTime.slice(pos_comma + 2);
                         if (searchTime === matchTime) {
+                            var pos_colon = searchTime.indexOf(":");
+                            var forecastTime = searchTime.substring(0, pos_colon) + searchTime.substr(-2);
                             var newForecast = new Forecast(
                                 saveForecastDate,
+                                forecastTime,
                                 response.list[idx].weather[0].icon,
                                 response.list[idx].main.temp,
                                 response.list[idx].main.humidity
@@ -401,8 +404,12 @@ $(document).ready(function () {
             // Need to save last entry in response array as the fifth entry in 5-day forecast
             // if inquiring before 2 pm.
             if (fiveDayForecast.length < 5) {
+                var searchTime = forecastDateTime.slice(pos_comma + 2);
+                var pos_colon = searchTime.indexOf(":");
+                var forecastTime = searchTime.substring(0, pos_colon) + searchTime.substr(-2);
                 var newForecast = new Forecast(
                     compareDate,
+                    forecastTime,
                     response.list[39].weather[0].icon,
                     response.list[39].main.temp,
                     response.list[39].main.humidity
@@ -467,8 +474,9 @@ $(document).ready(function () {
     //------------------------------------------------------
     // Constructor for 5-day forecast objects
     //------------------------------------------------------
-    function Forecast(fcDate, fcIcon, fcTemp, fcHumidity) {
+    function Forecast(fcDate, fcTime, fcIcon, fcTemp, fcHumidity) {
         this.forecastDate = fcDate;
+        this.forecastTime = fcTime;
         this.forecastIcon = fcIcon;
         this.forecastTemp = fcTemp;
         this.forecastHumidity = fcHumidity;
@@ -480,10 +488,10 @@ $(document).ready(function () {
     //------------------------------------------------------
     function createForecastDay(forecastDay, forecast) {
 
-        var forecastDate = $("<p>");
+        var forecastDateTime = $("<p>");
 
-        forecastDate.text(forecast.forecastDate);
-        forecastDay.append(forecastDate);
+        forecastDateTime.text(forecast.forecastDate + " " + forecast.forecastTime);
+        forecastDay.append(forecastDateTime);
 
         var forecastIcon = $("<img>");
         forecastIcon.attr(
