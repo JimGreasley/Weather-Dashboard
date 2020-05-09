@@ -383,8 +383,10 @@ $(document).ready(function () {
                         // isolate the time portion from end of forecast 'date+time' string
                         var searchTime = forecastDateTime.slice(pos_comma + 2);
                         if (searchTime === matchTime) {
+                            // isolate the hour digits from the forecast time
                             var pos_colon = searchTime.indexOf(":");
-                            var forecastTime = searchTime.substring(0, pos_colon) + searchTime.substr(-2);
+                            // concatenate the hour and am/pm indicator to create forecast time to be displayed
+                            var forecastTime = searchTime.substring(0, pos_colon) + searchTime.substr(-2).toLowerCase();
                             var newForecast = new Forecast(
                                 saveForecastDate,
                                 forecastTime,
@@ -405,8 +407,10 @@ $(document).ready(function () {
             // if inquiring before 2 pm.
             if (fiveDayForecast.length < 5) {
                 var searchTime = forecastDateTime.slice(pos_comma + 2);
+                // isolate the hour digits from the forecast time
                 var pos_colon = searchTime.indexOf(":");
-                var forecastTime = searchTime.substring(0, pos_colon) + searchTime.substr(-2);
+                // concatenate the hour and am/pm indicator to create forecast time to be displayed
+                var forecastTime = searchTime.substring(0, pos_colon) + searchTime.substr(-2).toLowerCase();
                 var newForecast = new Forecast(
                     compareDate,
                     forecastTime,
@@ -490,7 +494,8 @@ $(document).ready(function () {
 
         var forecastDateTime = $("<p>");
 
-        forecastDateTime.text(forecast.forecastDate + " " + forecast.forecastTime);
+        // concatenate forecast date and time data
+        forecastDateTime.text(forecast.forecastDate + " - " + forecast.forecastTime);
         forecastDay.append(forecastDateTime);
 
         var forecastIcon = $("<img>");
