@@ -23,3 +23,9 @@ https://github.com/JimGreasley/Weather-Dashboard
 
 ## Heroku deployment
 https://rhubarb-crumble-97219.herokuapp.com/
+
+
+## Screen image:
+
+![](public/assets/images/weather-dashboard.png)
+
