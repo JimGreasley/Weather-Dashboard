@@ -1,6 +1,7 @@
-/* body {
-    padding: 0px 10px;
-} */
+body {
+    /* padding: 0px 10px; */
+    background-color: cornsilk
+}
 
 .no-gutters {
     margin-right: 0;
@@ -20,7 +21,7 @@
 .jumbotron {
     height: 120px;
     text-align: center;
-    background-color: #26309e;
+    background-color: #5d65c0;
 }
 /* .card-link {
     color: black;
@@ -59,6 +60,8 @@
     width: 160px;
     height: 200px;
     border: 1px solid black;
+    border-radius: 5%;
+    background-color: powderblue;
     margin-inline-end: 10px;
     padding: 10px;
 /*    

@@ -15,6 +15,10 @@ app.get("/api/weather/name/:name", function (req, res) {
 
     axios.get(queryURL).then(function ({ data }) {
         res.json(data);
+    })
+    .catch(err => {
+        //console.log(err.response);
+        res.json(err.response.status);
     });
 });
 
