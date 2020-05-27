@@ -195,10 +195,31 @@ $(document).ready(function () {
                 "src",
                 "https://openweathermap.org/img/w/" + response.weather[0].icon + ".png"
             );
-
             cityRow.append(colCity, colIcon);
 
+            //cityRow.append(colCity);
+
             $currentWeather.append(cityRow);
+
+
+            // "Current Conditions" heading 
+            var currentConditionRow = $("<div>").addClass("row");
+
+            var currCondHeadingLit = $("<div>").addClass("col-4 h5");
+            currCondHeadingLit.text("Current Conditions: ");
+
+            // var colIcon = $("<img>").addClass("col-1");
+            // colIcon.attr(
+            //     "src",
+            //     "https://openweathermap.org/img/w/" + response.weather[0].icon + ".png"
+            // );
+            //currentConditionRow.append(currCondHeadingLit, colIcon);
+
+            currentConditionRow.append(currCondHeadingLit);
+
+            $currentWeather.append(currentConditionRow);
+
+
 
             // build temperature row using current temperature from ajax response
             var tempRow = $("<div>").addClass("row");
@@ -431,7 +452,7 @@ $(document).ready(function () {
             // create forecast block title 
             var forecastRow = $("<div>").addClass("row");
 
-            var colForecastTitleLit = $("<div>").addClass("col-3 h4");
+            var colForecastTitleLit = $("<div>").addClass("col-3 h5");
             colForecastTitleLit.text("5-Day Forecast:");
 
             forecastRow.append(colForecastTitleLit);
