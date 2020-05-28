@@ -17,8 +17,8 @@ app.get("/api/weather/name/:name", function (req, res) {
         res.json(data);
     })
     .catch(err => {
-        //console.log(err.response);
-        res.json(err.response.status);
+        console.log(err.response.data);
+        res.json(err.response.data);
     });
 });
 

@@ -178,98 +178,119 @@ $(document).ready(function () {
             // clear out the search city buffer
             $searchCity.val('');
 
-            var latitude = response.coord.lat;
-            var longitude = response.coord.lon;
-            var cityID = response.id;
-
-            // build city row using city name, current date and current weather icon from ajax response
-            var cityRow = $("<div>").addClass("row");
-
-            var colCityDate = response.name + ' (' + moment().format("l") + ')';
-
-            var colCity = $("<div>").addClass("col-4 citydate");
-            colCity.text(colCityDate);
-
-            var colIcon = $("<img>").addClass("col-1");
-            colIcon.attr(
-                "src",
-                "https://openweathermap.org/img/w/" + response.weather[0].icon + ".png"
-            );
-            cityRow.append(colCity, colIcon);
-
-            //cityRow.append(colCity);
-
-            $currentWeather.append(cityRow);
-
-
-            // "Current Conditions" heading 
-            var currentConditionRow = $("<div>").addClass("row");
-
-            var currCondHeadingLit = $("<div>").addClass("col-4 h5");
-            currCondHeadingLit.text("Current Conditions: ");
-
-            // var colIcon = $("<img>").addClass("col-1");
-            // colIcon.attr(
-            //     "src",
-            //     "https://openweathermap.org/img/w/" + response.weather[0].icon + ".png"
-            // );
-            //currentConditionRow.append(currCondHeadingLit, colIcon);
-
-            currentConditionRow.append(currCondHeadingLit);
-
-            $currentWeather.append(currentConditionRow);
-
-
-
-            // build temperature row using current temperature from ajax response
-            var tempRow = $("<div>").addClass("row");
-
-            var colTempLit = $("<div>").addClass("col-2");
-            colTempLit.text("Temperature:");
-            var colTempVal = $("<div>").addClass("col-2");
-            colTempVal.text(response.main.temp.toFixed(0) + " \u00B0F");
-            tempRow.append(colTempLit, colTempVal);
-
-            $currentWeather.append(tempRow);
-
-            // build humidity row using current humidity value from ajax response
-            var humidityRow = $("<div>").addClass("row");
-
-            var colHumLit = $("<div>").addClass("col-2");
-            colHumLit.text("Humidity:");
-            var colHumVal = $("<div>").addClass("col-2");
-            colHumVal.text(response.main.humidity + " %");
-            humidityRow.append(colHumLit, colHumVal);
-
-            $currentWeather.append(humidityRow);
-
-            // build wind speed row using current wind speed value from ajax response
-            var windSpeedRow = $("<div>").addClass("row");
-
-            var colWindLit = $("<div>").addClass("col-2");
-            colWindLit.text("Wind Speed:");
-            var colWindVal = $("<div>").addClass("col-2");
-            colWindVal.text(response.wind.speed.toFixed(0) + " mph");
-            windSpeedRow.append(colWindLit, colWindVal);
-
-            $currentWeather.append(windSpeedRow);
-
-            // need to use longitude & latitude (from ajax response above) to get UV Index value
-            getUVIndex(cityID, latitude, longitude);
-
-            // city name and cityID from response in city history array (of objects)
-            saveSearchCity(cityName, cityID);
-
+            if (response.cod === 200) {
+                displayCurrentWeather(response, cityName)
+            } else {
+                // Display exception message when city name searched for is not found (404)
+                var cityNotFoundRow = $("<div>").addClass("row h4");
+                cityNotFoundRow.text('City name "' + cityName + '" not found, please re-enter');
+                $currentWeather.append(cityNotFoundRow);
+            }
+        
         })
             .catch(function (err) {
                 console.log("AJAX error: ", err);
-            });
+        });
+    }
+
+
+    //-------------------------------------------------------------------------------------
+    // Display current weather data for valid city name or ID. 
+    //-------------------------------------------------------------------------------------
+
+    function displayCurrentWeather(response, cityName) {
+
+        var latitude = response.coord.lat;
+        var longitude = response.coord.lon;
+        var cityID = response.id;
+        // replace cityName with name returned in response,
+        // this should help to maintain consistency regarding format of saved city names 
+        cityName = response.name;
+
+        // build city row using city name, current date and current weather icon from ajax response
+        var cityRow = $("<div>").addClass("row");
+
+        var colCityDate = response.name + ' (' + moment().format("l") + ')';
+
+        var colCity = $("<div>").addClass("col-4 citydate");
+        colCity.text(colCityDate);
+
+        var colIcon = $("<img>").addClass("col-1");
+        colIcon.attr(
+            "src",
+            "https://openweathermap.org/img/w/" + response.weather[0].icon + ".png"
+        );
+        cityRow.append(colCity, colIcon);
+
+        //cityRow.append(colCity);
+
+        $currentWeather.append(cityRow);
+
+
+        // "Current Conditions" heading 
+        var currentConditionRow = $("<div>").addClass("row");
+
+        var currCondHeadingLit = $("<div>").addClass("col-4 h5");
+        currCondHeadingLit.text("Current Conditions: ");
+
+        // var colIcon = $("<img>").addClass("col-1");
+        // colIcon.attr(
+        //     "src",
+        //     "https://openweathermap.org/img/w/" + response.weather[0].icon + ".png"
+        // );
+        //currentConditionRow.append(currCondHeadingLit, colIcon);
+
+        currentConditionRow.append(currCondHeadingLit);
+
+        $currentWeather.append(currentConditionRow);
+
+
+
+        // build temperature row using current temperature from ajax response
+        var tempRow = $("<div>").addClass("row");
+
+        var colTempLit = $("<div>").addClass("col-2");
+        colTempLit.text("Temperature:");
+        var colTempVal = $("<div>").addClass("col-2");
+        colTempVal.text(response.main.temp.toFixed(0) + " \u00B0F");
+        tempRow.append(colTempLit, colTempVal);
+
+        $currentWeather.append(tempRow);
+
+        // build humidity row using current humidity value from ajax response
+        var humidityRow = $("<div>").addClass("row");
+
+        var colHumLit = $("<div>").addClass("col-2");
+        colHumLit.text("Humidity:");
+        var colHumVal = $("<div>").addClass("col-2");
+        colHumVal.text(response.main.humidity + " %");
+        humidityRow.append(colHumLit, colHumVal);
+
+        $currentWeather.append(humidityRow);
+
+        // build wind speed row using current wind speed value from ajax response
+        var windSpeedRow = $("<div>").addClass("row");
+
+        var colWindLit = $("<div>").addClass("col-2");
+        colWindLit.text("Wind Speed:");
+        var colWindVal = $("<div>").addClass("col-2");
+        colWindVal.text(response.wind.speed.toFixed(0) + " mph");
+        windSpeedRow.append(colWindLit, colWindVal);
+
+        $currentWeather.append(windSpeedRow);
+
+        // need to use longitude & latitude (from ajax response above) to get UV Index value
+        getUVIndex(cityID, latitude, longitude);
+
+        // city name and cityID from response in city history array (of objects)
+        saveSearchCity(cityName, cityID);
+
     }
 
 
     //-------------------------------------------------------------------------------------
     // function to get the UV Index for the city in question using latitude and longitude
-    // returned in response to request for current weather above (getCurrentWeather). 
+    // returned in response to request for current weather above (displayCurrentWeather). 
     //-------------------------------------------------------------------------------------
 
     function getUVIndex(cityId, lat, lon) {
