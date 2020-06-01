@@ -210,9 +210,9 @@ $(document).ready(function () {
         // build city row using city name, current date and current weather icon from ajax response
         var cityRow = $("<div>").addClass("row");
 
-        var colCityDate = response.name + ' (' + moment().format("l") + ')';
+        var colCityDate = response.name + ' (' + moment().format("ddd") + ', ' + moment().format("l") + ')';
 
-        var colCity = $("<div>").addClass("col-4 citydate");
+        var colCity = $("<div>").addClass("col-5 citydate");
         colCity.text(colCityDate);
 
         var colIcon = $("<img>").addClass("col-1");
@@ -222,25 +222,35 @@ $(document).ready(function () {
         );
         cityRow.append(colCity, colIcon);
 
-        //cityRow.append(colCity);
+        // cityRow.append(colCity);
 
         $currentWeather.append(cityRow);
 
+        // add blank line before forecast area
+        //var forecastRow = $("<br>");
+        //$currentWeather.append($("<br>"));
 
         // "Current Conditions" heading 
         var currentConditionRow = $("<div>").addClass("row");
 
-        var currCondHeadingLit = $("<div>").addClass("col-4 h5");
-        currCondHeadingLit.text("Current Conditions: ");
+        var currCondHeadingLit = $("<div>").addClass("col-5 h5");
+        currCondHeadingLit.text("Current Conditions as of " + moment().format("h:mm a") + ':');
 
         // var colIcon = $("<img>").addClass("col-1");
         // colIcon.attr(
         //     "src",
         //     "https://openweathermap.org/img/w/" + response.weather[0].icon + ".png"
         // );
-        //currentConditionRow.append(currCondHeadingLit, colIcon);
 
-        currentConditionRow.append(currCondHeadingLit);
+        var colDescription = $("<p>").addClass("col-4");
+        var weatherDesc = response.weather[0].description;
+        var weatherDescription = weatherDesc[0].toUpperCase() + weatherDesc.substr(1);
+        colDescription.text(weatherDescription);
+        //colDescription.text(response.weather[0].main + ': ' + response.weather[0].description);
+        
+        //currentConditionRow.append(currCondHeadingLit, colIcon, colDescription);
+        currentConditionRow.append(currCondHeadingLit, colDescription);
+        //currentConditionRow.append(currCondHeadingLit);
 
         $currentWeather.append(currentConditionRow);
 
