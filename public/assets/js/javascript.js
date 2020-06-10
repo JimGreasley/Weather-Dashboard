@@ -234,7 +234,9 @@ $(document).ready(function () {
         var currentConditionRow = $("<div>").addClass("row");
 
         var currCondHeadingLit = $("<div>").addClass("col-5 h5");
-        currCondHeadingLit.text("Current Conditions as of " + moment().format("h:mm a") + ':');
+        currCondHeadingLit.text("Current Conditions:");
+        //currCondHeadingLit.text("Conditions as of " + moment().format("h:mm a") + ':');
+
 
         // var colIcon = $("<img>").addClass("col-1");
         // colIcon.attr(
