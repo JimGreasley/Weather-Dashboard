@@ -22,11 +22,12 @@ body {
 }
 
 .jumbotron {
-    height: 120px;
+    height: 80px;
     text-align: center;
     /* background-color: #034f84; */
     /* background-color: rgb(31, 128, 255); */
     background-color: #5d65c0;
+    padding-top: 2rem;
 }
 /* .card-link {
     color: black;

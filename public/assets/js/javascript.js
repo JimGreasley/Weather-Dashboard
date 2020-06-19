@@ -207,12 +207,93 @@ $(document).ready(function () {
         // this should help to maintain consistency regarding format of saved city names 
         cityName = response.name;
 
+        //----------------------------------------------------------------------------------------------------
+        // Using GMT offset of browser locale and GMT offset of city whose weather will be displayed
+        //   to calculate the current local date-time of target city:
+        // 1. utilize API timezone offset from GMT in seconds to calculate GMT offset in hours for target city
+        // 2. get GMT offset (in minutes) for browsing locale, convert to hours
+        // 3. capture current browser locale date-time from moment.js
+        // 4. calculate the total time difference in hours between browser locale and target city:
+        //    difference will be positive if target city is east of browser locale; negative if west
+        // 5. if total time difference (hours) has a fractional (decimal) portion (should always be 0.5?)
+        //    then convert it to minutes (+/- 30)
+        // 6. use moment 'add' method to convert browser locale date-t ime to target city's local date-time
+        //----------------------------------------------------------------------------------------------------
+
+        // utilize API timezone offset (in seconds) from GMT to calculate GMT offset in hours for target city
+        let tzOffsetHrs = response.timezone / 3600;
+        if (tzOffsetHrs < 0) {
+            var gmtInd = "GMT" + tzOffsetHrs;
+        } else if (tzOffsetHrs > 0) {
+            var gmtInd = "GMT+" + tzOffsetHrs;
+        } else {
+            var gmtInd = "GMT";
+        }
+        console.log("timezone offset (secs): ", response.timezone, " (hours): ", gmtInd);
+
+        // get GMT offset (in minutes) for browsing locale, convert to hours
+        var localeDate = new Date();
+        var localeOffsetMinutes = localeDate.getTimezoneOffset();
+        // offset in minutes is what needs to be added/subtracted to the browser locale time to get to GMT -
+        // we want the opposite (and in hours): the hours to be added/subtracted to GMT to get browser locale time.
+        var localeOffsetHrs = localeOffsetMinutes / 60 * - 1; 
+
+        var timeDiffHrs = tzOffsetHrs - localeOffsetHrs;
+        console.log("local offset (hrs): ", localeOffsetHrs, " total offset (hrs): ", timeDiffHrs);
+
+        // capture current browser locale date-time from moment.js
+        var momentLocalDateTime = moment();
+
+        // initialize vars that will be used to alter browser locale time to create local time for target city
+        var timeDiffMins = 0;
+        var timeDiffHrsInt = 0;
+
+        if (timeDiffHrs < 0) {
+            // target city is west of browsing locale
+            var timeDiffIsNegative = true;
+            console.log("negative time diff");
+        } else {
+            // target city is east of browsing locale
+            var timeDiffIsNegative = false;
+        }
+
+        if (Number.isInteger(timeDiffHrs)) {
+            // time difference is an integer - no partial hours
+            console.log("integer time diff, local time: ", momentLocalDateTime.format());
+            timeDiffHrsInt = timeDiffHrs;
+        } else {
+        // if time difference has a decimal portion (should always be 0.5?) then isolate integer piece
+        // (whole hours) by eliminating the 0.5 portion and use 30 minutes instead.
+            console.log("decimal time diff, local time: ", momentLocalDateTime.format());
+            if (timeDiffIsNegative) {
+                timeDiffMins = -30;
+                timeDiffHrsInt = timeDiffHrs + 0.5;
+            } else {
+                timeDiffMins = 30;
+                timeDiffHrsInt = timeDiffHrs - 0.5;
+            }
+        }
+
+        // if time difference is zero then do not need to alter target city local time (same as browser locale)
+        if (timeDiffHrs != 0) {
+            momentLocalDateTime.add(timeDiffHrsInt, 'hours');
+            momentLocalDateTime.add(timeDiffMins, 'minutes');
+        }
+
+        console.log("target city local time: ", momentLocalDateTime.format());
+
+
         // build city row using city name, current date and current weather icon from ajax response
+
         var cityRow = $("<div>").addClass("row");
+        //console.log(response.sys.country);
+        if (response.sys.country === 'US') {
+            var colCityDate = response.name + ' (' + momentLocalDateTime.format("ddd") + ', ' + momentLocalDateTime.format("l") +  ')';
+        } else {
+            var colCityDate = response.name + ', ' + response.sys.country + ' (' + momentLocalDateTime.format("ddd") + ', ' + momentLocalDateTime.format("l") + ')';
+        }
 
-        var colCityDate = response.name + ' (' + moment().format("ddd") + ', ' + moment().format("l") + ')';
-
-        var colCity = $("<div>").addClass("col-5 citydate");
+        var colCity = $("<div>").addClass("col-6 citydate");
         colCity.text(colCityDate);
 
         var colIcon = $("<img>").addClass("col-1");
@@ -233,10 +314,9 @@ $(document).ready(function () {
         // "Current Conditions" heading 
         var currentConditionRow = $("<div>").addClass("row");
 
-        var currCondHeadingLit = $("<div>").addClass("col-5 h5");
-        currCondHeadingLit.text("Current Conditions:");
-        //currCondHeadingLit.text("Conditions as of " + moment().format("h:mm a") + ':');
-
+        var currCondHeadingLit = $("<div>").addClass("col-6 h5");
+        currCondHeadingLit.text("Conditions as of " + momentLocalDateTime.format("h:mm a") + ' (' + gmtInd + '):');
+        //currCondHeadingLit.text("Conditions as of " + moment().format("HH:mm") + ' ' + gmtInd + ':');
 
         // var colIcon = $("<img>").addClass("col-1");
         // colIcon.attr(
@@ -292,7 +372,7 @@ $(document).ready(function () {
         $currentWeather.append(windSpeedRow);
 
         // need to use longitude & latitude (from ajax response above) to get UV Index value
-        getUVIndex(cityID, latitude, longitude);
+        getUVIndex(cityID, latitude, longitude, momentLocalDateTime);
 
         // city name and cityID from response in city history array (of objects)
         saveSearchCity(cityName, cityID);
@@ -305,7 +385,7 @@ $(document).ready(function () {
     // returned in response to request for current weather above (displayCurrentWeather). 
     //-------------------------------------------------------------------------------------
 
-    function getUVIndex(cityId, lat, lon) {
+    function getUVIndex(cityId, lat, lon, momentLocalDateTime) {
 
         // set up the AJAX query URL
 
@@ -360,7 +440,7 @@ $(document).ready(function () {
 
             $currentWeather.append(uvIndexRow);
 
-            getForecast(cityId);
+            getForecast(cityId, momentLocalDateTime);
 
         });
     }
@@ -371,7 +451,7 @@ $(document).ready(function () {
     // returned in response to request for current weather above (getCurrentWeather). 
     //-------------------------------------------------------------------------------------
 
-    function getForecast(cityID) {
+    function getForecast(cityID, momentLocalDateTime) {
 
         // array of forecast data (objects) for the next five days
         var fiveDayForecast = [];
@@ -400,7 +480,7 @@ $(document).ready(function () {
 
             // Start searching forecast data with current date so that when forecast date changes
             // we know we have moved into forecast data for the next day.
-            var searchDate = moment().format("l");
+            var searchDate = momentLocalDateTime.format("l");
             console.log(searchDate);
 
             //var forecastDateTime = "";
@@ -569,3 +649,35 @@ $(document).ready(function () {
     }
 
 });
+
+// original, "wet" code
+// if (Number.isInteger(timeDiffHrs)) {
+//     // time difference is an integer - no partial hours
+//     console.log("integer TD");
+//     timeDiffHrsInt = timeDiffHrs;
+//     if (timeDiffIsNegative) {
+//        console.log("negative TD");
+//         // change time difference to positive and subtract half hour
+//         timeDiffHrsInt *= -1;
+//         momentLocalDateTime.subtract(timeDiffHrsInt, 'hours');
+//     } else {
+//         momentLocalDateTime.add(timeDiffHrsInt, 'hours');
+//     }
+// } else {
+// // if time difference has a decimal portion then isolate integer piece (whole hours) ...
+// // (decimal should always be ".5" which is 30 minutes).
+//     console.log("decimal TD");
+//     if (timeDiffIsNegative) {
+//         timeDiffMins = -30;
+//         console.log("negative TD");
+//         // change time difference to positive and subtract half hour
+//         timeDiffHrsInt = timeDiffHrs * -1 - 0.5;
+//         momentLocalDateTime.subtract(timeDiffHrsInt, 'hours');
+//         momentLocalDateTime.subtract(30, 'minutes');
+//     } else {
+//         timeDiffMins = 30;
+//         timeDiffHrsInt = timeDiffHrs - 0.5;
+//         momentLocalDateTime.add(timeDiffHrsInt, 'hours');
+//         momentLocalDateTime.add(30, 'minutes');
+//     }
+// }
