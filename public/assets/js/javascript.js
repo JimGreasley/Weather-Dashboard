@@ -215,9 +215,7 @@ $(document).ready(function () {
         // 3. capture current browser locale date-time from moment.js
         // 4. calculate the total time difference in hours between browser locale and target city:
         //    difference will be positive if target city is east of browser locale; negative if west
-        // 5. if total time difference (hours) has a fractional (decimal) portion (should always be 0.5?)
-        //    then convert it to minutes (+/- 30)
-        // 6. use moment 'add' method to convert browser locale date-t ime to target city's local date-time
+        // 6. use moment 'add' method to convert browser locale date-time to target city's local date-time
         //----------------------------------------------------------------------------------------------------
 
         // utilize API timezone offset (in seconds) from GMT to calculate GMT offset in hours for target city
@@ -238,52 +236,20 @@ $(document).ready(function () {
         // we want the opposite (and in hours): the hours to be added/subtracted to GMT to get browser locale time.
         var localeOffsetHrs = localeOffsetMinutes / 60 * - 1; 
 
-        var timeDiffHrs = tzOffsetHrs - localeOffsetHrs;
-        console.log("local offset (hrs): ", localeOffsetHrs, " total offset (hrs): ", timeDiffHrs);
+        var totalTimeDiffHrs = tzOffsetHrs - localeOffsetHrs;
+        console.log("local offset (hrs): ", localeOffsetHrs, " total offset (hrs): ", totalTimeDiffHrs);
 
         // capture current browser locale date-time from moment.js
         var momentLocalDateTime = moment();
 
-        // initialize vars that will be used to alter browser locale time to create local time for target city
-        var timeDiffMins = 0;
-        var timeDiffHrsInt = 0;
-
-        if (timeDiffHrs < 0) {
-            // target city is west of browsing locale
-            var timeDiffIsNegative = true;
-            console.log("negative time diff");
-        } else {
-            // target city is east of browsing locale
-            var timeDiffIsNegative = false;
-        }
-
-        if (Number.isInteger(timeDiffHrs)) {
-            // time difference is an integer - no partial hours
-            console.log("integer time diff, local time: ", momentLocalDateTime.format());
-            timeDiffHrsInt = timeDiffHrs;
-        } else {
-        // if time difference has a decimal portion (should always be 0.5?) then isolate integer piece
-        // (whole hours) by eliminating the 0.5 portion and use 30 minutes instead.
-            console.log("decimal time diff, local time: ", momentLocalDateTime.format());
-            if (timeDiffIsNegative) {
-                timeDiffMins = -30;
-                timeDiffHrsInt = timeDiffHrs + 0.5;
-            } else {
-                timeDiffMins = 30;
-                timeDiffHrsInt = timeDiffHrs - 0.5;
-            }
-        }
-
-        // if time difference is zero then do not need to alter target city local time (same as browser locale)
-        if (timeDiffHrs != 0) {
-            momentLocalDateTime.add(timeDiffHrsInt, 'hours');
-            momentLocalDateTime.add(timeDiffMins, 'minutes');
-        }
+        // add total time difference to browser local time to get target city local time 
+        momentLocalDateTime.add(totalTimeDiffHrs, 'hours');
 
         console.log("target city local time: ", momentLocalDateTime.format());
 
-
+        //-------------------------------------------------------------------------------------------
         // build city row using city name, current date and current weather icon from ajax response
+        //-------------------------------------------------------------------------------------------
 
         var cityRow = $("<div>").addClass("row");
         //console.log(response.sys.country);
@@ -307,22 +273,14 @@ $(document).ready(function () {
 
         $currentWeather.append(cityRow);
 
-        // add blank line before forecast area
-        //var forecastRow = $("<br>");
-        //$currentWeather.append($("<br>"));
-
+        //----------------------------------------------------
         // "Current Conditions" heading 
+        //----------------------------------------------------
         var currentConditionRow = $("<div>").addClass("row");
 
         var currCondHeadingLit = $("<div>").addClass("col-6 h5");
         currCondHeadingLit.text("Conditions as of " + momentLocalDateTime.format("h:mm a") + ' (' + gmtInd + '):');
         //currCondHeadingLit.text("Conditions as of " + moment().format("HH:mm") + ' ' + gmtInd + ':');
-
-        // var colIcon = $("<img>").addClass("col-1");
-        // colIcon.attr(
-        //     "src",
-        //     "https://openweathermap.org/img/w/" + response.weather[0].icon + ".png"
-        // );
 
         var colDescription = $("<p>").addClass("col-4");
         var weatherDesc = response.weather[0].description;
@@ -337,8 +295,9 @@ $(document).ready(function () {
         $currentWeather.append(currentConditionRow);
 
 
-
+        //----------------------------------------------------------------------------
         // build temperature row using current temperature from ajax response
+        //----------------------------------------------------------------------------
         var tempRow = $("<div>").addClass("row");
 
         var colTempLit = $("<div>").addClass("col-2");
@@ -349,7 +308,9 @@ $(document).ready(function () {
 
         $currentWeather.append(tempRow);
 
+        //----------------------------------------------------------------------------
         // build humidity row using current humidity value from ajax response
+        //----------------------------------------------------------------------------
         var humidityRow = $("<div>").addClass("row");
 
         var colHumLit = $("<div>").addClass("col-2");
@@ -360,7 +321,9 @@ $(document).ready(function () {
 
         $currentWeather.append(humidityRow);
 
+        //----------------------------------------------------------------------------
         // build wind speed row using current wind speed value from ajax response
+        //----------------------------------------------------------------------------
         var windSpeedRow = $("<div>").addClass("row");
 
         var colWindLit = $("<div>").addClass("col-2");
@@ -371,10 +334,14 @@ $(document).ready(function () {
 
         $currentWeather.append(windSpeedRow);
 
+        //-----------------------------------------------------------------------------------
         // need to use longitude & latitude (from ajax response above) to get UV Index value
+        //-----------------------------------------------------------------------------------
         getUVIndex(cityID, latitude, longitude, momentLocalDateTime);
 
+        //-----------------------------------------------------------------------------------
         // city name and cityID from response in city history array (of objects)
+        //-----------------------------------------------------------------------------------
         saveSearchCity(cityName, cityID);
 
     }
@@ -458,7 +425,7 @@ $(document).ready(function () {
 
         // set up the AJAX query URL
 
-        console.log("Geting forecast for city ID: " + cityID);
+        console.log("Getting forecast for city ID: " + cityID);
         //console.log(moment().format("l"));
 
         var queryURL = "/api/weather/forecast/id/" + cityID;
@@ -470,7 +437,7 @@ $(document).ready(function () {
             //console.log(response);
 
             //  for (let i = 0; i < response.cnt; i++) {
-            //      var js_d = new Date(Number(response.list[i].dt) * 1000);
+            //      let js_d = new Date(Number(response.list[i].dt) * 1000);
             //      console.log(js_d.toLocaleString(),
             //          response.list[i].main.temp,
             //          response.list[i].main.humidity,
@@ -478,18 +445,31 @@ $(document).ready(function () {
             //          response.list[i].main.temp_max);
             //  }
 
+            //-------------------------------------------------------------------------------------------
             // Start searching forecast data with current date so that when forecast date changes
             // we know we have moved into forecast data for the next day.
-            var searchDate = momentLocalDateTime.format("l");
+            //-------------------------------------------------------------------------------------------
+            // However, if we are inquiring about a city on the other side of the world from Phoenix,
+            // the local time there may already be the next day.  So, cannot use the target city's local
+            // date - always use the browser's local date as the starting search date.
+            //var searchDate = momentLocalDateTime.format("l");
+            //-------------------------------------------------------------------------------------------
+            var searchDate = moment().format("l");
             console.log(searchDate);
 
-            //var forecastDateTime = "";
-            //var compareDate = "";
-            //var saveForecastDate = "";
-            //var pos_comma = 0;
-            //var searchTime = "";
+            var forecastDateTime = "";
+            var saveForecastDate = "";
+
+            var compareDate  = "";
+            var searchTime   = "";
+            var forecastTime = "";
+
+            var pos_comma   = 0;
+            var pos_colon   = 0;
+
             var searchForTime = false;
             var idx = 0;
+
             // During summer use match time of 5 pm for Phoenix & Chandler. That is the hotest part of the day.
             if (response.city.name === "Chandler" || response.city.name === "Phoenix") {
                 var matchTime = "5:00:00 PM";
@@ -500,27 +480,28 @@ $(document).ready(function () {
             do {
                 // convert forecast date-time into a js date and then to human readable format
                 var js_d = new Date(Number(response.list[idx].dt) * 1000);
-                var forecastDateTime = js_d.toLocaleString();
+                forecastDateTime = js_d.toLocaleString();
                 //console.log("forecast DateTime ", forecastDateTime);
                 // isolate date portion (mm/dd/yyyy) from beginning of forecast 'date+time' string
-                var pos_comma = forecastDateTime.indexOf(",");
-                var compareDate = forecastDateTime.slice(0, pos_comma);
+                pos_comma   = forecastDateTime.indexOf(",");
+                compareDate = forecastDateTime.slice(0, pos_comma);
                 //console.log("compare date: ", compareDate, " search date: ", searchDate);
                 if (compareDate !== searchDate) {
                     // The forecast data has changed to a new day, so replace the
                     // search date with the new forecast date and trigger search based on time
-                    var saveForecastDate = compareDate;
-                    searchDate = compareDate;
-                    searchForTime = true;
+                    saveForecastDate = compareDate;
+                    searchDate       = compareDate;
+                    searchForTime    = true;
                 } else {
                     if (searchForTime) {
                         // isolate the time portion from end of forecast 'date+time' string
-                        var searchTime = forecastDateTime.slice(pos_comma + 2);
+                        searchTime = forecastDateTime.slice(pos_comma + 2);
                         if (searchTime === matchTime) {
+                            //console.log("Type of 'js_d':", typeof js_d);
                             // isolate the hour digits from the forecast time
-                            var pos_colon = searchTime.indexOf(":");
+                            pos_colon = searchTime.indexOf(":");
                             // concatenate the hour and am/pm indicator to create forecast time to be displayed
-                            var forecastTime = searchTime.substring(0, pos_colon) + searchTime.substr(-2).toLowerCase();
+                            forecastTime = searchTime.substring(0, pos_colon) + searchTime.substr(-2).toLowerCase();
                             var newForecast = new Forecast(
                                 saveForecastDate,
                                 forecastTime,
@@ -537,14 +518,16 @@ $(document).ready(function () {
                 idx++
             } while (idx < response.cnt);
 
+            //-----------------------------------------------------------------------------------
             // Need to save last entry in response array as the fifth entry in 5-day forecast
             // if inquiring before 2 pm.
+            //-----------------------------------------------------------------------------------
             if (fiveDayForecast.length < 5) {
-                var searchTime = forecastDateTime.slice(pos_comma + 2);
+                searchTime = forecastDateTime.slice(pos_comma + 2);
                 // isolate the hour digits from the forecast time
-                var pos_colon = searchTime.indexOf(":");
+                pos_colon = searchTime.indexOf(":");
                 // concatenate the hour and am/pm indicator to create forecast time to be displayed
-                var forecastTime = searchTime.substring(0, pos_colon) + searchTime.substr(-2).toLowerCase();
+                forecastTime = searchTime.substring(0, pos_colon) + searchTime.substr(-2).toLowerCase();
                 var newForecast = new Forecast(
                     compareDate,
                     forecastTime,
@@ -650,34 +633,38 @@ $(document).ready(function () {
 
 });
 
-// original, "wet" code
-// if (Number.isInteger(timeDiffHrs)) {
-//     // time difference is an integer - no partial hours
-//     console.log("integer TD");
-//     timeDiffHrsInt = timeDiffHrs;
-//     if (timeDiffIsNegative) {
-//        console.log("negative TD");
-//         // change time difference to positive and subtract half hour
-//         timeDiffHrsInt *= -1;
-//         momentLocalDateTime.subtract(timeDiffHrsInt, 'hours');
-//     } else {
-//         momentLocalDateTime.add(timeDiffHrsInt, 'hours');
-//     }
-// } else {
-// // if time difference has a decimal portion then isolate integer piece (whole hours) ...
-// // (decimal should always be ".5" which is 30 minutes).
-//     console.log("decimal TD");
-//     if (timeDiffIsNegative) {
-//         timeDiffMins = -30;
-//         console.log("negative TD");
-//         // change time difference to positive and subtract half hour
-//         timeDiffHrsInt = timeDiffHrs * -1 - 0.5;
-//         momentLocalDateTime.subtract(timeDiffHrsInt, 'hours');
-//         momentLocalDateTime.subtract(30, 'minutes');
-//     } else {
-//         timeDiffMins = 30;
-//         timeDiffHrsInt = timeDiffHrs - 0.5;
-//         momentLocalDateTime.add(timeDiffHrsInt, 'hours');
-//         momentLocalDateTime.add(30, 'minutes');
-//     }
-// }
+        // initialize vars that will be used to alter browser locale time to create local time for target city
+        // var timeDiffMins = 0;
+        // var timeDiffHrsInt = 0;
+
+        // if (timeDiffHrs < 0) {
+        //     // target city is west of browsing locale
+        //     var timeDiffIsNegative = true;
+        //     console.log("negative time diff");
+        // } else {
+        //     // target city is east of browsing locale
+        //     var timeDiffIsNegative = false;
+        // }
+
+        // if (Number.isInteger(timeDiffHrs)) {
+        //     // time difference is an integer - no partial hours
+        //     console.log("integer time diff, local time: ", momentLocalDateTime.format());
+        //     timeDiffHrsInt = timeDiffHrs;
+        // } else {
+        // // if time difference has a decimal portion (should always be 0.5?) then isolate integer piece
+        // // (whole hours) by eliminating the 0.5 portion and use 30 minutes instead.
+        //     console.log("decimal time diff, local time: ", momentLocalDateTime.format());
+        //     if (timeDiffIsNegative) {
+        //         timeDiffMins = -30;
+        //         timeDiffHrsInt = timeDiffHrs + 0.5;
+        //     } else {
+        //         timeDiffMins = 30;
+        //         timeDiffHrsInt = timeDiffHrs - 0.5;
+        //     }
+        // }
+
+        // if time difference is zero then do not need to alter target city local time (same as browser locale)
+        // if (timeDiffHrs != 0) {
+        //     momentLocalDateTime.add(timeDiffHrsInt, 'hours');
+        //     momentLocalDateTime.add(timeDiffMins, 'minutes');
+        // }
