@@ -1,7 +1,7 @@
 body {
     /* padding: 0px 10px; */
     /* background-color: #f7cac9; */
-    background-color: cornsilk;
+    background-color: palegoldenrod;
     /* background-color: rgb(255, 255, 166) */
     /* background-color: #fdfd9a; */
 }
@@ -26,7 +26,8 @@ body {
     text-align: center;
     /* background-color: #034f84; */
     /* background-color: rgb(31, 128, 255); */
-    background-color: #5d65c0;
+    /* background-color: #5d65c0; */
+    background-color: lightskyblue;
     padding-top: 2rem;
 }
 /* .card-link {
@@ -68,7 +69,7 @@ body {
     border: 1px solid black;
     border-radius: 7%;
     /* background-color: #92a8d1; */
-    background-color: skyblue; 
+    background-color: lightskyblue;
     /* background-color: powderblue; */
     margin-inline-end: 10px;
     padding: 10px;

@@ -449,9 +449,9 @@ $(document).ready(function () {
             // Start searching forecast data with current date so that when forecast date changes
             // we know we have moved into forecast data for the next day.
             //-------------------------------------------------------------------------------------------
-            // However, if we are inquiring about a city on the other side of the world from Phoenix,
-            // the local time there may already be the next day.  So, cannot use the target city's local
-            // date - always use the browser's local date as the starting search date.
+            // However, if we are inquiring about a city on the other side of the world from the browser's
+            // locale, the local time there may already be the next day.  So, cannot use the target city's
+            // local date - always use the browser's local date as the starting search date.
             //var searchDate = momentLocalDateTime.format("l");
             //-------------------------------------------------------------------------------------------
             var searchDate = moment().format("l");
@@ -632,39 +632,3 @@ $(document).ready(function () {
     }
 
 });
-
-        // initialize vars that will be used to alter browser locale time to create local time for target city
-        // var timeDiffMins = 0;
-        // var timeDiffHrsInt = 0;
-
-        // if (timeDiffHrs < 0) {
-        //     // target city is west of browsing locale
-        //     var timeDiffIsNegative = true;
-        //     console.log("negative time diff");
-        // } else {
-        //     // target city is east of browsing locale
-        //     var timeDiffIsNegative = false;
-        // }
-
-        // if (Number.isInteger(timeDiffHrs)) {
-        //     // time difference is an integer - no partial hours
-        //     console.log("integer time diff, local time: ", momentLocalDateTime.format());
-        //     timeDiffHrsInt = timeDiffHrs;
-        // } else {
-        // // if time difference has a decimal portion (should always be 0.5?) then isolate integer piece
-        // // (whole hours) by eliminating the 0.5 portion and use 30 minutes instead.
-        //     console.log("decimal time diff, local time: ", momentLocalDateTime.format());
-        //     if (timeDiffIsNegative) {
-        //         timeDiffMins = -30;
-        //         timeDiffHrsInt = timeDiffHrs + 0.5;
-        //     } else {
-        //         timeDiffMins = 30;
-        //         timeDiffHrsInt = timeDiffHrs - 0.5;
-        //     }
-        // }
-
-        // if time difference is zero then do not need to alter target city local time (same as browser locale)
-        // if (timeDiffHrs != 0) {
-        //     momentLocalDateTime.add(timeDiffHrsInt, 'hours');
-        //     momentLocalDateTime.add(timeDiffMins, 'minutes');
-        // }
