@@ -208,14 +208,10 @@ $(document).ready(function () {
         cityName = response.name;
 
         //----------------------------------------------------------------------------------------------------
-        // Using GMT offset of browser locale and GMT offset of city whose weather will be displayed
-        //   to calculate the current local date-time of target city:
+        // Calculate the current local date-time of target city whose weather will be displayed:
         // 1. utilize API timezone offset from GMT in seconds to calculate GMT offset in hours for target city
-        // 2. get GMT offset (in minutes) for browsing locale, convert to hours
-        // 3. capture current browser locale date-time from moment.js
-        // 4. calculate the total time difference in hours between browser locale and target city:
-        //    difference will be positive if target city is east of browser locale; negative if west
-        // 6. use moment 'add' method to convert browser locale date-time to target city's local date-time
+        // 2. capture current UTC/GMT date-time from moment.js
+        // 3. use moment 'add' method to convert UTC date-time to target city's current local date-time
         //----------------------------------------------------------------------------------------------------
 
         // utilize API timezone offset (in seconds) from GMT to calculate GMT offset in hours for target city
@@ -229,21 +225,11 @@ $(document).ready(function () {
         }
         console.log("timezone offset (secs): ", response.timezone, " (hours): ", gmtInd);
 
-        // get GMT offset (in minutes) for browsing locale, convert to hours
-        var localeDate = new Date();
-        var localeOffsetMinutes = localeDate.getTimezoneOffset();
-        // offset in minutes is what needs to be added/subtracted to the browser locale time to get to GMT -
-        // we want the opposite (and in hours): the hours to be added/subtracted to GMT to get browser locale time.
-        var localeOffsetHrs = localeOffsetMinutes / 60 * - 1; 
+        // capture current UTC/GMT date-time from moment.js
+        var momentLocalDateTime = moment.utc();
 
-        var totalTimeDiffHrs = tzOffsetHrs - localeOffsetHrs;
-        console.log("local offset (hrs): ", localeOffsetHrs, " total offset (hrs): ", totalTimeDiffHrs);
-
-        // capture current browser locale date-time from moment.js
-        var momentLocalDateTime = moment();
-
-        // add total time difference to browser local time to get target city local time 
-        momentLocalDateTime.add(totalTimeDiffHrs, 'hours');
+        // add GMT offset in hours to UTC/GMT time to get target city current local date-time 
+        momentLocalDateTime.add(tzOffsetHrs, 'hours');
 
         console.log("target city local time: ", momentLocalDateTime.format());
 
@@ -283,10 +269,10 @@ $(document).ready(function () {
         //currCondHeadingLit.text("Conditions as of " + moment().format("HH:mm") + ' ' + gmtInd + ':');
 
         var colDescription = $("<p>").addClass("col-4");
-        var weatherDesc = response.weather[0].description;
-        var weatherDescription = weatherDesc[0].toUpperCase() + weatherDesc.substr(1);
-        colDescription.text(weatherDescription);
-        //colDescription.text(response.weather[0].main + ': ' + response.weather[0].description);
+        // var weatherDesc = response.weather[0].description;
+        // var weatherDescription = weatherDesc[0].toUpperCase() + weatherDesc.substr(1);
+        // colDescription.text(weatherDescription);
+        colDescription.text(response.weather[0].main + ': ' + response.weather[0].description);
         
         //currentConditionRow.append(currCondHeadingLit, colIcon, colDescription);
         currentConditionRow.append(currCondHeadingLit, colDescription);
@@ -337,7 +323,7 @@ $(document).ready(function () {
         //-----------------------------------------------------------------------------------
         // need to use longitude & latitude (from ajax response above) to get UV Index value
         //-----------------------------------------------------------------------------------
-        getUVIndex(cityID, latitude, longitude, momentLocalDateTime);
+        getUVIndex(cityID, latitude, longitude, tzOffsetHrs);
 
         //-----------------------------------------------------------------------------------
         // city name and cityID from response in city history array (of objects)
@@ -352,7 +338,7 @@ $(document).ready(function () {
     // returned in response to request for current weather above (displayCurrentWeather). 
     //-------------------------------------------------------------------------------------
 
-    function getUVIndex(cityId, lat, lon, momentLocalDateTime) {
+    function getUVIndex(cityId, lat, lon, tzOffsetHrs) {
 
         // set up the AJAX query URL
 
@@ -407,7 +393,7 @@ $(document).ready(function () {
 
             $currentWeather.append(uvIndexRow);
 
-            getForecast(cityId, momentLocalDateTime);
+            getForecast(cityId, tzOffsetHrs);
 
         });
     }
@@ -418,7 +404,7 @@ $(document).ready(function () {
     // returned in response to request for current weather above (getCurrentWeather). 
     //-------------------------------------------------------------------------------------
 
-    function getForecast(cityID, momentLocalDateTime) {
+    function getForecast(cityID, tzOffsetHrs) {
 
         // array of forecast data (objects) for the next five days
         var fiveDayForecast = [];
@@ -434,11 +420,17 @@ $(document).ready(function () {
             url: queryURL,
             method: "GET"
         }).then(function (response) {
-            //console.log(response);
+            console.log(response);
 
             //  for (let i = 0; i < response.cnt; i++) {
-            //      let js_d = new Date(Number(response.list[i].dt) * 1000);
-            //      console.log(js_d.toLocaleString(),
+            //      //let js_d = new Date(Number(response.list[i].dt) * 1000);
+            //      let momentLocalDateTime = moment.unix(response.list[i].dt).utc();
+            //      // add total time difference to browser local time to get target city local time 
+            //      momentLocalDateTime.add(tzOffsetHrs, 'hours');
+            //      //console.log(js_d.toLocaleString(),
+            //      //console.log(js_d.toUTCString(),
+            //      console.log(momentLocalDateTime.format("l"),
+            //          momentLocalDateTime.format("h:mm a"),
             //          response.list[i].main.temp,
             //          response.list[i].main.humidity,
             //          response.list[i].main.temp_min,
@@ -449,70 +441,67 @@ $(document).ready(function () {
             // Start searching forecast data with current date so that when forecast date changes
             // we know we have moved into forecast data for the next day.
             //-------------------------------------------------------------------------------------------
-            // However, if we are inquiring about a city on the other side of the world from the browser's
-            // locale, the local time there may already be the next day.  So, cannot use the target city's
-            // local date - always use the browser's local date as the starting search date.
-            //var searchDate = momentLocalDateTime.format("l");
-            //-------------------------------------------------------------------------------------------
+
             var searchDate = moment().format("l");
             console.log(searchDate);
-
-            var forecastDateTime = "";
-            var saveForecastDate = "";
-
+            
             var compareDate  = "";
-            var searchTime   = "";
-            var forecastTime = "";
+            var saveForecastDate = "";
+            var saveForecastTime = "";
+            var saveForecastIcon = "";
+            var saveForecastHumidity = 0;
+            var saveForecastHighTemp = 0;
 
-            var pos_comma   = 0;
-            var pos_colon   = 0;
+             var momentLocalDateTime;
 
-            var searchForTime = false;
+            var processedFirstForecastDay = false;
+            var forecastTemp = 0;
+            var forecastTime;
+
             var idx = 0;
 
-            // During summer use match time of 5 pm for Phoenix & Chandler. That is the hotest part of the day.
-            if (response.city.name === "Chandler" || response.city.name === "Phoenix") {
-                var matchTime = "5:00:00 PM";
-            } else {
-                var matchTime = "2:00:00 PM";
-            }
-
             do {
-                // convert forecast date-time into a js date and then to human readable format
-                var js_d = new Date(Number(response.list[idx].dt) * 1000);
-                forecastDateTime = js_d.toLocaleString();
-                //console.log("forecast DateTime ", forecastDateTime);
-                // isolate date portion (mm/dd/yyyy) from beginning of forecast 'date+time' string
-                pos_comma   = forecastDateTime.indexOf(",");
-                compareDate = forecastDateTime.slice(0, pos_comma);
-                //console.log("compare date: ", compareDate, " search date: ", searchDate);
+                // initialize local date-time in UTC from forecast using moment.js 
+                momentLocalDateTime = moment.unix(response.list[idx].dt).utc();
+
+                // add time zone offset to UTC forecast date-time to get target city local date-time 
+                momentLocalDateTime.add(tzOffsetHrs, 'hours');
+                compareDate = momentLocalDateTime.format("l");
+                let timeStr = momentLocalDateTime.format("h:mma");
+                forecastTime = timeStr.slice(0, timeStr.length - 1);
+                //forecastTime = momentLocalDateTime.format("H:mm");
+
                 if (compareDate !== searchDate) {
-                    // The forecast data has changed to a new day, so replace the
-                    // search date with the new forecast date and trigger search based on time
-                    saveForecastDate = compareDate;
-                    searchDate       = compareDate;
-                    searchForTime    = true;
-                } else {
-                    if (searchForTime) {
-                        // isolate the time portion from end of forecast 'date+time' string
-                        searchTime = forecastDateTime.slice(pos_comma + 2);
-                        if (searchTime === matchTime) {
-                            //console.log("Type of 'js_d':", typeof js_d);
-                            // isolate the hour digits from the forecast time
-                            pos_colon = searchTime.indexOf(":");
-                            // concatenate the hour and am/pm indicator to create forecast time to be displayed
-                            forecastTime = searchTime.substring(0, pos_colon) + searchTime.substr(-2).toLowerCase();
-                            var newForecast = new Forecast(
-                                saveForecastDate,
-                                forecastTime,
-                                response.list[idx].weather[0].icon,
-                                response.list[idx].main.temp,
-                                response.list[idx].main.humidity
+                    // The forecast data has changed to a new day, so ...
+                    //  load saved forecast data from the previous day (if any yet) into the forecast array
+                    //  and save the first hour's forecast data for the next day.
+                    if (processedFirstForecastDay) {
+                        // create new forecast object with previous days forecast data
+                        var newForecast = new Forecast(
+                            saveForecastDate,
+                            saveForecastTime,
+                            saveForecastIcon,
+                            saveForecastHighTemp,
+                            saveForecastHumidity
                             );
-                            fiveDayForecast.push(newForecast);
-                            // found the time slot we want so stop searching for time match
-                            searchForTime = false;
-                        }
+                        // push/load new forecast object into 5-day array
+                        fiveDayForecast.push(newForecast);
+                    } else {
+                        processedFirstForecastDay    = true;
+                    }
+                    saveForecastDate     = compareDate;
+                    searchDate           = compareDate;
+                    saveForecastHighTemp = response.list[idx].main.temp;
+                    saveForecastTime     = forecastTime;
+                    saveForecastIcon     = response.list[idx].weather[0].icon;
+                    saveForecastHumidity = response.list[idx].main.humidity
+                } else {
+                    forecastTemp = response.list[idx].main.temp;
+                    if (forecastTemp > saveForecastHighTemp) {
+                        saveForecastTime     = forecastTime;
+                        saveForecastIcon     = response.list[idx].weather[0].icon;
+                        saveForecastHighTemp = forecastTemp;
+                        saveForecastHumidity = response.list[idx].main.humidity;
                     }
                 }
                 idx++
@@ -523,11 +512,6 @@ $(document).ready(function () {
             // if inquiring before 2 pm.
             //-----------------------------------------------------------------------------------
             if (fiveDayForecast.length < 5) {
-                searchTime = forecastDateTime.slice(pos_comma + 2);
-                // isolate the hour digits from the forecast time
-                pos_colon = searchTime.indexOf(":");
-                // concatenate the hour and am/pm indicator to create forecast time to be displayed
-                forecastTime = searchTime.substring(0, pos_colon) + searchTime.substr(-2).toLowerCase();
                 var newForecast = new Forecast(
                     compareDate,
                     forecastTime,
@@ -558,8 +542,6 @@ $(document).ready(function () {
             // DAY 1
 
             var forecastDay1 = $("<div>").addClass("forecast-box");
-
-            //createForecastDay(forecastDay1, 7, response);  15, 23, 31, 39
 
             createForecastDay(forecastDay1, fiveDayForecast[0]);
 
