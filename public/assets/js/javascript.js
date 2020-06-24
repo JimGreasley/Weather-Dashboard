@@ -269,10 +269,10 @@ $(document).ready(function () {
         //currCondHeadingLit.text("Conditions as of " + moment().format("HH:mm") + ' ' + gmtInd + ':');
 
         var colDescription = $("<p>").addClass("col-4");
-        // var weatherDesc = response.weather[0].description;
-        // var weatherDescription = weatherDesc[0].toUpperCase() + weatherDesc.substr(1);
-        // colDescription.text(weatherDescription);
-        colDescription.text(response.weather[0].main + ': ' + response.weather[0].description);
+        var weatherDesc = response.weather[0].description;
+        var weatherDescription = weatherDesc[0].toUpperCase() + weatherDesc.substr(1);
+        colDescription.text(weatherDescription);
+        //colDescription.text(response.weather[0].main + ': ' + response.weather[0].description);
         
         //currentConditionRow.append(currCondHeadingLit, colIcon, colDescription);
         currentConditionRow.append(currCondHeadingLit, colDescription);

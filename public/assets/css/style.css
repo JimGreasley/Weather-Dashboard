@@ -39,22 +39,22 @@ body {
 
 .favorable {
     background-color: lightgreen;
-    color: white;
+    color: black;
 }
   
 .moderate {
     background-color: yellow;
-    color: white;
+    color: black;
 }
 
 .high {
     background-color: orange;
-    color: white;
+    color: black;
 }
   
 .severe {
     background-color: red;
-    color: white;
+    color: black;
 }
 
 .citydate {
