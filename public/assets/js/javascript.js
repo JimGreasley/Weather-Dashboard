@@ -282,28 +282,55 @@ $(document).ready(function () {
 
 
         //----------------------------------------------------------------------------
-        // build temperature row using current temperature from ajax response
+        // build temperature row using current temperature & sunrise time
         //----------------------------------------------------------------------------
         var tempRow = $("<div>").addClass("row");
 
         var colTempLit = $("<div>").addClass("col-2");
         colTempLit.text("Temperature:");
-        var colTempVal = $("<div>").addClass("col-2");
+        var colTempVal = $("<div>").addClass("col-4");
         colTempVal.text(response.main.temp.toFixed(0) + " \u00B0F");
-        tempRow.append(colTempLit, colTempVal);
+        
+        // capture local sunrise for today in UTC using moment.js 
+        momentSunrise = moment.unix(response.sys.sunrise).utc();
+        // add time zone offset to UTC sunrise to get target city local sunrise time
+        momentSunrise.add(tzOffsetHrs, 'hours');
+        let sunriseStr = momentSunrise.format("h:mm:ss a");
+        console.log("Sunrise/utc: ", momentSunrise.format(), " ", sunriseStr);
+
+        var colSunriseLit = $("<div>").addClass("col-1");
+        colSunriseLit.text("Sunrise:");
+        var colSunriseTime = $("<div>").addClass("col-2");
+        colSunriseTime.text(sunriseStr);
+        
+        tempRow.append(colTempLit, colTempVal, colSunriseLit, colSunriseTime);
 
         $currentWeather.append(tempRow);
 
         //----------------------------------------------------------------------------
-        // build humidity row using current humidity value from ajax response
+        // build humidity row using current humidity value and sunset time
         //----------------------------------------------------------------------------
         var humidityRow = $("<div>").addClass("row");
 
         var colHumLit = $("<div>").addClass("col-2");
         colHumLit.text("Humidity:");
-        var colHumVal = $("<div>").addClass("col-2");
+        var colHumVal = $("<div>").addClass("col-4");
         colHumVal.text(response.main.humidity + " %");
-        humidityRow.append(colHumLit, colHumVal);
+
+        // capture local sunset for today in UTC using moment.js 
+        momentSunset = moment.unix(response.sys.sunset).utc();
+        //console.log("Sunset/utc: ", momentSunset.format());
+        // add time zone offset to UTC sunset to get target city local sunset time
+        momentSunset.add(tzOffsetHrs, 'hours');
+        let sunsetStr = momentSunset.format("h:mm:ss a");
+        console.log("Sunset/utc: ", momentSunset.format(), " ", sunsetStr);
+        
+        var colSunsetLit = $("<div>").addClass("col-1");
+        colSunsetLit.text("Sunset:");
+        var colSunsetTime = $("<div>").addClass("col-2");
+        colSunsetTime.text(sunsetStr);
+        
+        humidityRow.append(colHumLit, colHumVal, colSunsetLit, colSunsetTime);
 
         $currentWeather.append(humidityRow);
 
