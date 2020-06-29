@@ -195,6 +195,65 @@ $(document).ready(function () {
 
 
     //-------------------------------------------------------------------------------------
+    // Convert wind direction in degrees to cardinal value. 
+    //-------------------------------------------------------------------------------------
+
+    function getWindCardinalDirection (windDegrees) {
+
+        if (windDegrees >= 349 & windDegrees <= 11) {
+            return "N"
+        } else
+        if (windDegrees >= 12 & windDegrees <= 33) {
+            return "NNE"
+        } else
+        if (windDegrees >= 34 & windDegrees <= 56) {
+            return "NE"
+        } else
+        if (windDegrees >= 57 & windDegrees <= 78) {
+            return "ENE"
+        } else
+        if (windDegrees >= 79 & windDegrees <= 101) {
+            return "E"
+        } else
+        if (windDegrees >= 102 & windDegrees <= 123) {
+            return "ESE"
+        } else
+        if (windDegrees >= 124 & windDegrees <= 146) {
+            return "SE"
+        } else
+        if (windDegrees >= 147 & windDegrees <= 168) {
+            return "SSE"
+        } else
+        if (windDegrees >= 169 & windDegrees <= 191) {
+            return "S"
+        } else
+        if (windDegrees >= 192 & windDegrees <= 213) {
+            return "SSW"
+        } else
+        if (windDegrees >= 214 & windDegrees <= 236) {
+            return "SW"
+        } else
+        if (windDegrees >= 237 & windDegrees <= 258) {
+            return "WSW"
+        } else
+        if (windDegrees >= 259 & windDegrees <= 281) {
+            return "W"
+        } else
+        if (windDegrees >= 282 & windDegrees <= 303) {
+            return "WNW"
+        } else
+        if (windDegrees >= 304 & windDegrees <= 326) {
+            return "NW"
+        } else
+        if (windDegrees >= 327 & windDegrees <= 348) {
+            return "NNW"
+        } else {
+            return "???"
+        };
+    }
+
+
+    //-------------------------------------------------------------------------------------
     // Display current weather data for valid city name or ID. 
     //-------------------------------------------------------------------------------------
 
@@ -335,14 +394,14 @@ $(document).ready(function () {
         $currentWeather.append(humidityRow);
 
         //----------------------------------------------------------------------------
-        // build wind speed row using current wind speed value from ajax response
+        // build wind row using current wind speed & direction (degrees) values
         //----------------------------------------------------------------------------
         var windSpeedRow = $("<div>").addClass("row");
 
         var colWindLit = $("<div>").addClass("col-2");
-        colWindLit.text("Wind Speed:");
-        var colWindVal = $("<div>").addClass("col-2");
-        colWindVal.text(response.wind.speed.toFixed(0) + " mph");
+        colWindLit.text("Wind:");
+        var colWindVal = $("<div>").addClass("col-3");
+        colWindVal.text(response.wind.speed.toFixed(0) + " mph " + getWindCardinalDirection(response.wind.deg) + " (" + response.wind.deg + "\u00B0)");
         windSpeedRow.append(colWindLit, colWindVal);
 
         $currentWeather.append(windSpeedRow);
@@ -413,10 +472,20 @@ $(document).ready(function () {
             var colUvIndexLit = $("<div>").addClass("col-2");
             colUvIndexLit.text("UV Index:");
 
-            var colUvIndexVal = $("<div>").addClass("col-1");
+            var colUvIndexVal = $("<div>").addClass("col-4");
             colUvIndexVal.append(uvIndexSpan);
 
-            uvIndexRow.append(colUvIndexLit, colUvIndexVal);
+            var colLatitudeLit = $("<div>").addClass("col-1");
+            colLatitudeLit.text("Latitude:");
+            var colLatitudeVal = $("<div>").addClass("col-1");
+            colLatitudeVal.text(lat);
+
+            var colLongitudeLit = $("<div>").addClass("col-3");
+            colLongitudeLit.text("Longitude:  " + lon);
+            //var colLongitudeVal = $("<div>").addClass("col-1");
+            //colLongitudeVal.text(lon);
+
+            uvIndexRow.append(colUvIndexLit, colUvIndexVal, colLatitudeLit, colLatitudeVal, colLongitudeLit);
 
             $currentWeather.append(uvIndexRow);
 
@@ -478,8 +547,9 @@ $(document).ready(function () {
             var saveForecastIcon = "";
             var saveForecastHumidity = 0;
             var saveForecastHighTemp = 0;
+            var saveForecastWind = {};
 
-             var momentLocalDateTime;
+            var momentLocalDateTime;
 
             var processedFirstForecastDay = false;
             var forecastTemp = 0;
@@ -509,7 +579,8 @@ $(document).ready(function () {
                             saveForecastTime,
                             saveForecastIcon,
                             saveForecastHighTemp,
-                            saveForecastHumidity
+                            saveForecastHumidity,
+                            saveForecastWind
                             );
                         // push/load new forecast object into 5-day array
                         fiveDayForecast.push(newForecast);
@@ -522,6 +593,7 @@ $(document).ready(function () {
                     saveForecastTime     = forecastTime;
                     saveForecastIcon     = response.list[idx].weather[0].icon;
                     saveForecastHumidity = response.list[idx].main.humidity
+                    saveForecastWind     = response.list[idx].wind
                 } else {
                     forecastTemp = response.list[idx].main.temp;
                     if (forecastTemp > saveForecastHighTemp) {
@@ -529,6 +601,7 @@ $(document).ready(function () {
                         saveForecastIcon     = response.list[idx].weather[0].icon;
                         saveForecastHighTemp = forecastTemp;
                         saveForecastHumidity = response.list[idx].main.humidity;
+                        saveForecastWind     = response.list[idx].wind;
                     }
                 }
                 idx++
@@ -544,7 +617,8 @@ $(document).ready(function () {
                     forecastTime,
                     response.list[39].weather[0].icon,
                     response.list[39].main.temp,
-                    response.list[39].main.humidity
+                    response.list[39].main.humidity,
+                    response.list[39].wind
                 );
                 fiveDayForecast.push(newForecast);
             }
@@ -604,12 +678,13 @@ $(document).ready(function () {
     //------------------------------------------------------
     // Constructor for 5-day forecast objects
     //------------------------------------------------------
-    function Forecast(fcDate, fcTime, fcIcon, fcTemp, fcHumidity) {
+    function Forecast(fcDate, fcTime, fcIcon, fcTemp, fcHumidity, fcWind) {
         this.forecastDate = fcDate;
         this.forecastTime = fcTime;
         this.forecastIcon = fcIcon;
         this.forecastTemp = fcTemp;
         this.forecastHumidity = fcHumidity;
+        this.forecastWind = fcWind;
     }
 
     //------------------------------------------------------
@@ -638,6 +713,12 @@ $(document).ready(function () {
         var forecastHumidity = $("<p>");
         forecastHumidity.text("Humidity: " + forecast.forecastHumidity + " %");
         forecastDay.append(forecastHumidity);
+        
+        var forecastWind = $("<p>");
+        forecastWind.text("Wind: " + forecast.forecastWind.speed.toFixed(0) + " mph " +
+         getWindCardinalDirection(forecast.forecastWind.deg));
+        // + forecast.forecastWind.deg + "\u00B0");
+        forecastDay.append(forecastWind);
     }
 
 });

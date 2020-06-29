@@ -64,15 +64,15 @@ body {
 
 .forecast-box {
     display: inline-block;
-    width: 160px;
-    height: 200px;
+    width: 163px;
+    height: 220px;
     border: 1px solid black;
     border-radius: 7%;
     /* background-color: #92a8d1; */
     background-color: lightskyblue;
     /* background-color: powderblue; */
     margin-inline-end: 10px;
-    padding: 10px;
+    padding: 6px;
 /*    
     border-right: 1px solid black;
     border-bottom: 1px solid black;
