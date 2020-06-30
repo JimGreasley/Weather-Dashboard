@@ -307,41 +307,48 @@ $(document).ready(function () {
         var colCity = $("<div>").addClass("col-6 citydate");
         colCity.text(colCityDate);
 
+        var colLatitudeLit = $("<div>").addClass("col-1 align-bot");
+        colLatitudeLit.text("Latitude:");
+        var colLatitudeVal = $("<div>").addClass("col-1 align-bot");
+        colLatitudeVal.text(latitude);
+
+        var colLongitudeLit = $("<div>").addClass("col-3 align-bot");
+        colLongitudeLit.text("Longitude:  " + longitude);
+        //var colLongitudeVal = $("<div>").addClass("col-1");
+        //colLongitudeVal.text(lon);
+
+        cityRow.append(colCity, colLatitudeLit, colLatitudeVal, colLongitudeLit);
+
+        // cityRow.append(colCity, colIcon);
+
+        $currentWeather.append(cityRow);
+
+        //---------------------------------------------------------------
+        // Create "Current Conditions" heading followed by weather icon 
+        //---------------------------------------------------------------
+
+        // add blank line before current conditions area
+        var forecastRow = $("<br>");
+        $currentWeather.append(forecastRow);
+
+        var currentConditionRow = $("<div>").addClass("row");
+
+        var currCondHeadingLit = $("<div>").addClass("col-6 h5");
+        currCondHeadingLit.text("Conditions as of " + momentLocalDateTime.format("h:mm a") + ' (' + gmtInd + '):');
+
         var colIcon = $("<img>").addClass("col-1");
         colIcon.attr(
             "src",
             "https://openweathermap.org/img/w/" + response.weather[0].icon + ".png"
         );
-        cityRow.append(colCity, colIcon);
 
-        // cityRow.append(colCity);
-
-        $currentWeather.append(cityRow);
-
-        //----------------------------------------------------
-        // "Current Conditions" heading 
-        //----------------------------------------------------
-        var currentConditionRow = $("<div>").addClass("row");
-
-        var currCondHeadingLit = $("<div>").addClass("col-6 h5");
-        currCondHeadingLit.text("Conditions as of " + momentLocalDateTime.format("h:mm a") + ' (' + gmtInd + '):');
-        //currCondHeadingLit.text("Conditions as of " + moment().format("HH:mm") + ' ' + gmtInd + ':');
-
-        var colDescription = $("<p>").addClass("col-4");
-        var weatherDesc = response.weather[0].description;
-        var weatherDescription = weatherDesc[0].toUpperCase() + weatherDesc.substr(1);
-        colDescription.text(weatherDescription);
-        //colDescription.text(response.weather[0].main + ': ' + response.weather[0].description);
-        
-        //currentConditionRow.append(currCondHeadingLit, colIcon, colDescription);
-        currentConditionRow.append(currCondHeadingLit, colDescription);
-        //currentConditionRow.append(currCondHeadingLit);
+        currentConditionRow.append(currCondHeadingLit, colIcon);
 
         $currentWeather.append(currentConditionRow);
 
 
         //----------------------------------------------------------------------------
-        // build temperature row using current temperature & sunrise time
+        // build temperature row using current temperature & weather icon description
         //----------------------------------------------------------------------------
         var tempRow = $("<div>").addClass("row");
 
@@ -350,6 +357,26 @@ $(document).ready(function () {
         var colTempVal = $("<div>").addClass("col-4");
         colTempVal.text(response.main.temp.toFixed(0) + " \u00B0F");
         
+        var colDescription = $("<div>").addClass("col-4");
+        var weatherDesc = response.weather[0].description;
+        var weatherDescription = weatherDesc[0].toUpperCase() + weatherDesc.substr(1);
+        colDescription.text(weatherDescription);
+        //colDescription.text(response.weather[0].main + ': ' + response.weather[0].description);
+        
+        tempRow.append(colTempLit, colTempVal, colDescription);
+
+        $currentWeather.append(tempRow);
+
+        //----------------------------------------------------------------------------
+        // build humidity row using current humidity value and sunrise time
+        //----------------------------------------------------------------------------
+        var humidityRow = $("<div>").addClass("row");
+
+        var colHumLit = $("<div>").addClass("col-2");
+        colHumLit.text("Humidity:");
+        var colHumVal = $("<div>").addClass("col-4");
+        colHumVal.text(response.main.humidity + " %");
+
         // capture local sunrise for today in UTC using moment.js 
         momentSunrise = moment.unix(response.sys.sunrise).utc();
         // add time zone offset to UTC sunrise to get target city local sunrise time
@@ -362,19 +389,19 @@ $(document).ready(function () {
         var colSunriseTime = $("<div>").addClass("col-2");
         colSunriseTime.text(sunriseStr);
         
-        tempRow.append(colTempLit, colTempVal, colSunriseLit, colSunriseTime);
+        humidityRow.append(colHumLit, colHumVal, colSunriseLit, colSunriseTime);
 
-        $currentWeather.append(tempRow);
+        $currentWeather.append(humidityRow);
 
-        //----------------------------------------------------------------------------
-        // build humidity row using current humidity value and sunset time
-        //----------------------------------------------------------------------------
-        var humidityRow = $("<div>").addClass("row");
+        //-------------------------------------------------------------------------------
+        // build wind row using current wind speed & direction (degrees) and sunset time
+        //-------------------------------------------------------------------------------
+        var windSpeedRow = $("<div>").addClass("row");
 
-        var colHumLit = $("<div>").addClass("col-2");
-        colHumLit.text("Humidity:");
-        var colHumVal = $("<div>").addClass("col-4");
-        colHumVal.text(response.main.humidity + " %");
+        var colWindLit = $("<div>").addClass("col-2");
+        colWindLit.text("Wind:");
+        var colWindVal = $("<div>").addClass("col-4");
+        colWindVal.text(response.wind.speed.toFixed(0) + " mph " + getWindCardinalDirection(response.wind.deg) + " (" + response.wind.deg + "\u00B0)");
 
         // capture local sunset for today in UTC using moment.js 
         momentSunset = moment.unix(response.sys.sunset).utc();
@@ -388,21 +415,8 @@ $(document).ready(function () {
         colSunsetLit.text("Sunset:");
         var colSunsetTime = $("<div>").addClass("col-2");
         colSunsetTime.text(sunsetStr);
-        
-        humidityRow.append(colHumLit, colHumVal, colSunsetLit, colSunsetTime);
-
-        $currentWeather.append(humidityRow);
-
-        //----------------------------------------------------------------------------
-        // build wind row using current wind speed & direction (degrees) values
-        //----------------------------------------------------------------------------
-        var windSpeedRow = $("<div>").addClass("row");
-
-        var colWindLit = $("<div>").addClass("col-2");
-        colWindLit.text("Wind:");
-        var colWindVal = $("<div>").addClass("col-3");
-        colWindVal.text(response.wind.speed.toFixed(0) + " mph " + getWindCardinalDirection(response.wind.deg) + " (" + response.wind.deg + "\u00B0)");
-        windSpeedRow.append(colWindLit, colWindVal);
+                
+        windSpeedRow.append(colWindLit, colWindVal, colSunsetLit, colSunsetTime);
 
         $currentWeather.append(windSpeedRow);
 
@@ -475,17 +489,7 @@ $(document).ready(function () {
             var colUvIndexVal = $("<div>").addClass("col-4");
             colUvIndexVal.append(uvIndexSpan);
 
-            var colLatitudeLit = $("<div>").addClass("col-1");
-            colLatitudeLit.text("Latitude:");
-            var colLatitudeVal = $("<div>").addClass("col-1");
-            colLatitudeVal.text(lat);
-
-            var colLongitudeLit = $("<div>").addClass("col-3");
-            colLongitudeLit.text("Longitude:  " + lon);
-            //var colLongitudeVal = $("<div>").addClass("col-1");
-            //colLongitudeVal.text(lon);
-
-            uvIndexRow.append(colUvIndexLit, colUvIndexVal, colLatitudeLit, colLatitudeVal, colLongitudeLit);
+            uvIndexRow.append(colUvIndexLit, colUvIndexVal);
 
             $currentWeather.append(uvIndexRow);
 

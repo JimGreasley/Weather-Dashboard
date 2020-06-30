@@ -62,6 +62,10 @@ body {
     font-weight: 400;
 }
 
+.align-bot {
+    margin-top: 12px;
+}
+
 .forecast-box {
     display: inline-block;
     width: 163px;
