@@ -7,9 +7,9 @@ $(document).ready(function () {
     var $searchCity = $("#search-city");
     var $cityHistory = $("#city-history");
 
-
-    // testing - delete Weather Cities history data from local storage
-    //localStorage.removeItem("WeatherCities");
+    //-------------------------------------------------------------
+    // get array of Weather Cities history data from local storage
+    //-------------------------------------------------------------
 
     var data = localStorage.getItem("WeatherCities");
 
@@ -20,17 +20,35 @@ $(document).ready(function () {
         var weather_cities = JSON.parse(data);
     }
 
+    //-------------------------------------------------------
+    // get City Id of last City displayed from local storage
+    //-------------------------------------------------------
+
+    var data = localStorage.getItem("WeatherCityIdLast");
+
+    if (!data) {
+        // create new last weather city ID - initialize to zero
+        var lastWeatherCityId = 0;
+    } else {
+        var lastWeatherCityId = JSON.parse(data);
+    }
+    console.log("Last weather city ID: ", lastWeatherCityId);
+
+
     // add each city in weather_cities array to history list group
     weather_cities.forEach(loadCity);
 
-    // use last city in weather_cities array to display weather on initial load 
-    if (weather_cities.length > 0) {
-        var lastCity = weather_cities[weather_cities.length - 1];
-        var lastCityId = lastCity.id;
-        var lastCityName = lastCity.name;
-        //console.log(saveCityId, saveCityName);
-        getCurrentWeather(lastCityName, lastCityId);
-    }
+    if (lastWeatherCityId > 0) {
+        getCurrentWeather(null, lastWeatherCityId);
+    } else 
+        // use last city in weather_cities array to display weather on initial load 
+        if (weather_cities.length > 0) {
+            var lastCity = weather_cities[weather_cities.length - 1];
+            var lastCityId = lastCity.id;
+            var lastCityName = lastCity.name;
+            //console.log(saveCityId, saveCityName);
+            getCurrentWeather(lastCityName, lastCityId);
+        }
 
 
     // set Event to select specific city when that city, in the history list, is clicked
@@ -52,6 +70,7 @@ $(document).ready(function () {
             if (searchCity === "clear") {
                 // remove (clear out) the Weather Cities array from local storage
                 localStorage.removeItem("WeatherCities");
+                localStorage.removeItem("WeatherCityIdLast");
                 // reload the main page
                 window.location.href = "index.html";
             } else {
@@ -102,6 +121,10 @@ $(document).ready(function () {
             // set Event to select specific city when that city, in the history list, is clicked
             $(".list-group-item").click(selectCity);
         }
+
+        // save cityID of weather city just displayed
+        localStorage.setItem("WeatherCityIdLast", JSON.stringify(cityID));
+
     }
 
     //--------------------------------------------------------------------
@@ -179,7 +202,8 @@ $(document).ready(function () {
             $searchCity.val('');
 
             if (response.cod === 200) {
-                displayCurrentWeather(response, cityName)
+                //displayCurrentWeather(response, cityName)
+                displayCurrentWeather(response)
             } else {
                 // Display exception message when city name searched for is not found (404)
                 var cityNotFoundRow = $("<div>").addClass("row h4");
@@ -257,7 +281,8 @@ $(document).ready(function () {
     // Display current weather data for valid city name or ID. 
     //-------------------------------------------------------------------------------------
 
-    function displayCurrentWeather(response, cityName) {
+    //function displayCurrentWeather(response, cityName) {
+    function displayCurrentWeather(response) {
 
         var latitude = response.coord.lat;
         var longitude = response.coord.lon;
