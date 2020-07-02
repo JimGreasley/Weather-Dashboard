@@ -200,7 +200,7 @@ $(document).ready(function () {
 
     function getWindCardinalDirection (windDegrees) {
 
-        if (windDegrees >= 349 & windDegrees <= 11) {
+        if ( (windDegrees >= 349 & windDegrees <= 360) | (windDegrees >= 0 & windDegrees <= 11) ) {
             return "N"
         } else
         if (windDegrees >= 12 & windDegrees <= 33) {
