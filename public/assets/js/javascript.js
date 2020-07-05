@@ -202,7 +202,6 @@ $(document).ready(function () {
             $searchCity.val('');
 
             if (response.cod === 200) {
-                //displayCurrentWeather(response, cityName)
                 displayCurrentWeather(response)
             } else {
                 // Display exception message when city name searched for is not found (404)
@@ -281,7 +280,6 @@ $(document).ready(function () {
     // Display current weather data for valid city name or ID. 
     //-------------------------------------------------------------------------------------
 
-    //function displayCurrentWeather(response, cityName) {
     function displayCurrentWeather(response) {
 
         var latitude = response.coord.lat;
@@ -334,7 +332,7 @@ $(document).ready(function () {
 
         var colLatitudeLit = $("<div>").addClass("col-1 align-bot");
         colLatitudeLit.text("Latitude:");
-        var colLatitudeVal = $("<div>").addClass("col-1 align-bot");
+        var colLatitudeVal = $("<div>").addClass("col-2 align-bot");
         colLatitudeVal.text(latitude);
 
         var colLongitudeLit = $("<div>").addClass("col-3 align-bot");
@@ -344,17 +342,51 @@ $(document).ready(function () {
 
         cityRow.append(colCity, colLatitudeLit, colLatitudeVal, colLongitudeLit);
 
-        // cityRow.append(colCity, colIcon);
-
         $currentWeather.append(cityRow);
+
+        //----------------------------------------------------------------------------
+        // build sunrise & sunset row 
+        //----------------------------------------------------------------------------
+        var sunriseRow = $("<div>").addClass("row");
+
+        var colIndentLit = $("<div>").addClass("col-6");
+
+        // capture local sunrise for today in UTC using moment.js 
+        momentSunrise = moment.unix(response.sys.sunrise).utc();
+        // add time zone offset to UTC sunrise to get target city local sunrise time
+        momentSunrise.add(tzOffsetHrs, 'hours');
+        let sunriseStr = momentSunrise.format("h:mm:ss a");
+        console.log("Sunrise/utc: ", momentSunrise.format(), " ", sunriseStr);
+
+        var colSunriseLit = $("<div>").addClass("col-1");
+        colSunriseLit.text("Sunrise:");
+        var colSunriseTime = $("<div>").addClass("col-2");
+        colSunriseTime.text(sunriseStr);
+
+        // capture local sunset for today in UTC using moment.js 
+        momentSunset = moment.unix(response.sys.sunset).utc();
+        //console.log("Sunset/utc: ", momentSunset.format());
+        // add time zone offset to UTC sunset to get target city local sunset time
+        momentSunset.add(tzOffsetHrs, 'hours');
+        let sunsetStr = momentSunset.format("h:mm:ss a");
+        console.log("Sunset/utc: ", momentSunset.format(), " ", sunsetStr);
+        
+        var colSunsetLit = $("<div>").addClass("col-1");
+        colSunsetLit.text("Sunset:");
+        var colSunsetTime = $("<div>").addClass("col-2");
+        colSunsetTime.text(sunsetStr);
+
+        sunriseRow.append(colIndentLit, colSunriseLit, colSunriseTime, colSunsetLit, colSunsetTime);
+
+        $currentWeather.append(sunriseRow);
 
         //---------------------------------------------------------------
         // Create "Current Conditions" heading followed by weather icon 
         //---------------------------------------------------------------
 
         // add blank line before current conditions area
-        var forecastRow = $("<br>");
-        $currentWeather.append(forecastRow);
+        //var forecastRow = $("<br>");
+        //$currentWeather.append(forecastRow);
 
         var currentConditionRow = $("<div>").addClass("row");
 
@@ -402,19 +434,7 @@ $(document).ready(function () {
         var colHumVal = $("<div>").addClass("col-4");
         colHumVal.text(response.main.humidity + " %");
 
-        // capture local sunrise for today in UTC using moment.js 
-        momentSunrise = moment.unix(response.sys.sunrise).utc();
-        // add time zone offset to UTC sunrise to get target city local sunrise time
-        momentSunrise.add(tzOffsetHrs, 'hours');
-        let sunriseStr = momentSunrise.format("h:mm:ss a");
-        console.log("Sunrise/utc: ", momentSunrise.format(), " ", sunriseStr);
-
-        var colSunriseLit = $("<div>").addClass("col-1");
-        colSunriseLit.text("Sunrise:");
-        var colSunriseTime = $("<div>").addClass("col-2");
-        colSunriseTime.text(sunriseStr);
-        
-        humidityRow.append(colHumLit, colHumVal, colSunriseLit, colSunriseTime);
+        humidityRow.append(colHumLit, colHumVal);
 
         $currentWeather.append(humidityRow);
 
@@ -428,20 +448,7 @@ $(document).ready(function () {
         var colWindVal = $("<div>").addClass("col-4");
         colWindVal.text(response.wind.speed.toFixed(0) + " mph " + getWindCardinalDirection(response.wind.deg) + " (" + response.wind.deg + "\u00B0)");
 
-        // capture local sunset for today in UTC using moment.js 
-        momentSunset = moment.unix(response.sys.sunset).utc();
-        //console.log("Sunset/utc: ", momentSunset.format());
-        // add time zone offset to UTC sunset to get target city local sunset time
-        momentSunset.add(tzOffsetHrs, 'hours');
-        let sunsetStr = momentSunset.format("h:mm:ss a");
-        console.log("Sunset/utc: ", momentSunset.format(), " ", sunsetStr);
-        
-        var colSunsetLit = $("<div>").addClass("col-1");
-        colSunsetLit.text("Sunset:");
-        var colSunsetTime = $("<div>").addClass("col-2");
-        colSunsetTime.text(sunsetStr);
-                
-        windSpeedRow.append(colWindLit, colWindVal, colSunsetLit, colSunsetTime);
+        windSpeedRow.append(colWindLit, colWindVal);
 
         $currentWeather.append(windSpeedRow);
 
