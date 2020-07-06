@@ -729,7 +729,7 @@ $(document).ready(function () {
     //------------------------------------------------------
     function createForecastDay(forecastDay, forecast) {
 
-        var forecastDateTime = $("<p>");
+        var forecastDateTime = $("<div>");
 
         // concatenate forecast date and time data
         forecastDateTime.text(forecast.forecastDate + " - " + forecast.forecastTime);
@@ -743,7 +743,7 @@ $(document).ready(function () {
         forecastDay.append(forecastIcon);
 
         var forecastTemp = $("<p>");
-        forecastTemp.text("Temp: " + forecast.forecastTemp.toFixed(0) + " \u00B0F");
+        forecastTemp.text("Hi Temp: " + forecast.forecastTemp.toFixed(0) + " \u00B0F");
         forecastDay.append(forecastTemp);
 
         var forecastHumidity = $("<p>");

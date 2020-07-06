@@ -69,7 +69,7 @@ body {
 .forecast-box {
     display: inline-block;
     width: 163px;
-    height: 220px;
+    height: 200px;
     border: 1px solid black;
     border-radius: 7%;
     /* background-color: #92a8d1; */
