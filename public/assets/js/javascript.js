@@ -358,9 +358,9 @@ $(document).ready(function () {
         let sunriseStr = momentSunrise.format("h:mm:ss a");
         console.log("Sunrise/utc: ", momentSunrise.format(), " ", sunriseStr);
 
-        var colSunriseLit = $("<div>").addClass("col-1");
+        var colSunriseLit = $("<p>").addClass("col-1");
         colSunriseLit.text("Sunrise:");
-        var colSunriseTime = $("<div>").addClass("col-2");
+        var colSunriseTime = $("<p>").addClass("col-2");
         colSunriseTime.text(sunriseStr);
 
         // capture local sunset for today in UTC using moment.js 
@@ -371,9 +371,9 @@ $(document).ready(function () {
         let sunsetStr = momentSunset.format("h:mm:ss a");
         console.log("Sunset/utc: ", momentSunset.format(), " ", sunsetStr);
         
-        var colSunsetLit = $("<div>").addClass("col-1");
+        var colSunsetLit = $("<p>").addClass("col-1");
         colSunsetLit.text("Sunset:");
-        var colSunsetTime = $("<div>").addClass("col-2");
+        var colSunsetTime = $("<p>").addClass("col-2");
         colSunsetTime.text(sunsetStr);
 
         sunriseRow.append(colIndentLit, colSunriseLit, colSunriseTime, colSunsetLit, colSunsetTime);
